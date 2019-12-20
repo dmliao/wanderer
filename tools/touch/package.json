@@ -1,5 +1,5 @@
 {
-  "name": "build",
+  "name": "touch",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -9,7 +9,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "himalaya": "^1.1.0",
-    "upath": "^1.2.0"
+    "dayjs": "^1.8.18"
   }
 }

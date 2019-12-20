@@ -55,7 +55,6 @@ const parseUrlXPath = () => {
 
         types[elementType].push(elementAttribute)
     }
-    console.log(types)
     return types;
 }
 
