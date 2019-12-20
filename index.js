@@ -15,7 +15,7 @@ if (argv.h || argv.help) {
 }
 
 const frameDir = argv.frame || argv.f || path.resolve(process.cwd(), 'frame')
-const contentDir = argv.content || argv.c || path.resolve(process.cwd(), 'content')
+const contentDir = argv.in || argv.i || path.resolve(process.cwd(), 'content')
 const buildDir = argv.out || argv.o || path.resolve(process.cwd(), 'build')
 
 let config = {
@@ -23,18 +23,19 @@ let config = {
     content: contentDir
 };
 
-if (fs.existsSync(path.resolve(process.cwd(), 'config.toml'))) {
+const configFile = argv.config || argv.c || path.resolve(process.cwd(), 'config.toml')
+if (fs.existsSync(configFile)) {
     const extraConfig = toml.parse(fs.readFileSync(path.resolve(process.cwd(), 'config.toml')));
     config = {...config, ...extraConfig}
 }
 
 const buildSite = async() => {
+    // TODO: add touch file.
     const touchedFiles = await touch(config.content);
-
-    console.log(touchedFiles)
 
     for (let file of touchedFiles) {
         build(path.resolve(file.dir, file.file), config, config.content, config.frame, buildDir);
     }
 }
+
 buildSite().then(() => console.timeEnd('build'))
