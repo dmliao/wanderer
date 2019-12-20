@@ -1,0 +1,14 @@
+{
+  "name": "wanderer",
+  "version": "0.0.0",
+  "description": "Static site and wiki for Amorphous",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Amorphous",
+  "license": "ISC",
+  "dependencies": {
+    "toml": "^3.0.0"
+  }
+}
