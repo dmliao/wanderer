@@ -10,7 +10,7 @@ const build = require('./tools/builder/index')
 console.time('build');
 
 if (argv.h || argv.help) {
-    console.log('Usage: wanderer -f <frame directory> -c <content directory> -o <out directory>')
+    console.log('Usage: wanderer -f <frame directory> -i <content directory> -o <out directory> -c <config file>')
     return;
 }
 
