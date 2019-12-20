@@ -9,6 +9,7 @@
   "author": "Amorphous",
   "license": "ISC",
   "dependencies": {
+    "minimist": "^1.2.0",
     "toml": "^3.0.0"
   }
 }
