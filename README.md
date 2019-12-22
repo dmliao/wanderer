@@ -14,6 +14,7 @@ A static site generator written with NodeJS.
 I made the interesting choice of having multiple nested package.json files. Running npm install in the base directory should install all of them automatically, but if for some reason that fails, you'll have to go and install dependencies in each tool manually:
 
 ```
+cd wanderer
 npm install
 cd builder
 npm install
@@ -25,7 +26,8 @@ npm install
 And then:
 
 ```
-wanderer -i <content folderpath> -f <frame folderpath> -o <build folderpath> -c <config filepath>
+cd wanderer
+node index -i <content folderpath> -f <frame folderpath> -o <build folderpath> -c <config filepath>
 ```
 
 > If no inputs are provided, wanderer will build in the current directory, assuming that the content lives in `./content`, the frame is in `./frame`, and the build should output to `./build`
