@@ -1,7 +1,7 @@
 {
   "name": "touch",
   "version": "1.0.0",
-  "description": "",
+  "description": "Figures out which files in a directory had been modified since a given date",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"

@@ -30,8 +30,23 @@ if (fs.existsSync(configFile)) {
 }
 
 const buildSite = async() => {
+
+    const touchFile = path.resolve(buildDir, '.touchfile')
+
+    // build all of the static files in the frame
+    const staticDir = path.resolve(frameDir, 'static')
+
+    if (fs.existsSync(staticDir)) {
+        const staticFiles = await touch(staticDir, touchFile)
+
+        for (let file of staticFiles) {
+            build(path.resolve(file.dir, file.file), config, staticDir, config.frame, path.resolve(buildDir, 'static'));
+        }
+    }
+
+    // build the content files
     // TODO: add touch file.
-    const touchedFiles = await touch(config.content);
+    const touchedFiles = await touch(config.content, touchFile);
 
     for (let file of touchedFiles) {
         build(path.resolve(file.dir, file.file), config, config.content, config.frame, buildDir);

@@ -39,8 +39,18 @@ const render = (template, config, layer) => {
             const key = tokens[1];
             const value = tokens[tokens.length - 1];
 
+            let partialPath = value
+            // spoony way to get rid of ' and "
+            if (partialPath.startsWith('"') || partialPath.startsWith("'")) {
+                partialPath = partialPath.slice(1)
+            }
+
+            if (partialPath.endsWith('"') || partialPath.endsWith("'")) {
+                partialPath = partialPath.slice(0, partialPath.length - 1)
+            }
+
             const baseDir = config._baseDir || process.cwd();
-            importedPartials[key] = fs.readFileSync(path.resolve(baseDir, value), 'utf-8');
+            importedPartials[key] = fs.readFileSync(path.resolve(baseDir, partialPath), 'utf-8');
             continue;
         }
 

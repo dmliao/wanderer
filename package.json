@@ -1,10 +1,11 @@
 {
   "name": "wanderer",
-  "version": "0.0.0",
-  "description": "Static site and wiki for Amorphous",
+  "version": "0.1.0",
+  "description": "Static site generator",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "postinstall": "cd tools/install && node npm-install-all.js"
   },
   "author": "Amorphous",
   "license": "ISC",
