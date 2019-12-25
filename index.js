@@ -7,6 +7,8 @@ var argv = require('minimist')(process.argv.slice(2));
 const touch = require('./tools/touch/index')
 const build = require('./tools/builder/index')
 
+const processImage = require('./tools/image-processor')
+
 console.time('build');
 
 if (argv.h || argv.help) {
@@ -45,8 +47,7 @@ const buildSite = async() => {
     }
 
     // build the content files
-    // TODO: add touch file.
-    const touchedFiles = await touch(config.content, touchFile);
+    const touchedFiles = await touch(config.content, touchFile, true);
 
     for (let file of touchedFiles) {
         build(path.resolve(file.dir, file.file), config, config.content, config.frame, buildDir);

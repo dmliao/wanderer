@@ -7,6 +7,8 @@ const processFilename = require('./utils/process-tempo-filename')
 
 const buildMarkdownFile = require('./parsers/md')
 
+const processImage = require('../image-processor/index')
+
 const imageExtensions = ['png', 'jpg']
 const metaExtensions = ['toml']
 const processedEntryExtensions = ['md', 'htm']
@@ -45,13 +47,14 @@ const buildFile = (filePath, globalConfig, baseContentDir, baseFrameDir, baseBui
     const processedFilename = p.name;
 
     // image
-    if (imageExtensions.indexOf(filePathDetails.ext) >= 0) {
+    if (imageExtensions.indexOf(filePathDetails.ext.toLowerCase()) >= 0) {
         // TODO: do some extra image processing.
-        buildStaticFile(filePath, path.resolve(targetDir, processedFilename + '.' + filePathDetails.ext));
+        processImage(filePath, path.resolve(targetDir, processedFilename + '.' + filePathDetails.ext))
+        // buildStaticFile(filePath, path.resolve(targetDir, processedFilename + '.' + filePathDetails.ext));
         return;
     }
 
-    if (processedEntryExtensions.indexOf(filePathDetails.ext) < 0) {
+    if (processedEntryExtensions.indexOf(filePathDetails.ext.toLowerCase()) < 0) {
         // it's static. We copy over the file without doing anything (though we do strip tempo dates if needed)
         buildStaticFile(filePath, path.resolve(targetDir, processedFilename + '.' + filePathDetails.ext));
         return;

@@ -75,4 +75,14 @@ The content is passed into `template`, so any top-level values in the config can
 
 #### Special config values
 
-Work in progress. So far, there's no special-casing.
+Work in progress.
+
+##### For Images
+
+Not actually implemented yet!
+
+These live under `config.images`:
+```
+noStripMetadata - skip the step when building images to strip the metadata.
+noPNGCompress - skip the step to run pngquant when building png images. Can speed up the build, but results in larger filesizes.
+```

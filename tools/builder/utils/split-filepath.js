@@ -4,7 +4,7 @@ const splitFilePath = (file) => {
     const ext = tokens.pop();
     return {
         name: tokens.join('.'),
-        ext
+        ext: ext.toLowerCase()
     }
 }
 
