@@ -32,9 +32,20 @@ node index -i <content folderpath> -f <frame folderpath> -o <build folderpath> -
 
 > If no inputs are provided, wanderer will build in the current directory, assuming that the content lives in `./content`, the frame is in `./frame`, and the build should output to `./build`
 
+## Other Dependencies
+
+Image processing was tricky to handle, so currently requires two external tools beyond what we get from npm install:
+
+### exiftool
+
+Used to strip metadata from photos before putting them online. This can be downloaded from https://exiftool.org/, and needs to be on the path as `exiftool` for the relevant functionality to work.
+
+### pngquant
+
+Used to further compress PNGs beyond what `sharp` can do. This can be downloaded from https://pngquant.org/, and needs to be on the path as `pngquant`.
+
 ## TODO
 
 * Figure out a method for handling lists and feeds. We don't want to have to add them to the build for every file, so we'll need some method to add to a specific page that those features are being used. (Probably in page level config.)
     * Lists will also make `touch` a bit more complicated, as any file that pulls content from a different directory will need to be accounted for by touch.
 * Actually use it to build a website - this is mostly in 'thought experiment' level of implementation, and so probably has edge cases I haven't considered
-* Create a method to compress images and automatically create favicons
