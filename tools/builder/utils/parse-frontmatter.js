@@ -21,7 +21,7 @@ const parseFrontmatter = (text) => {
 
     const result = {
         config: frontmatter,
-        text: splits.joint('---')
+        text: splits.join('---')
     }
 
     return result;
