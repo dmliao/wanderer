@@ -14,10 +14,19 @@ const buildMarkdownFile = (sourceFilePath, targetDirPath, processedFilename, bas
     const parsedText = parseFrontmatter(sourceText);
 
     const parsedConfig = { ...dirConfig, ...parsedText.config };
-    processedFilename = parsedConfig.url || processedFilename;
+
+    // handle file-level configuration
+    if (parsedConfig.private && parsedConfig.private === true) {
+        // skip this, since it's a private file
+        return;
+    }
+
+    processedFilename = parsedConfig.rename || processedFilename;
 
     // find the layout
     const layout = parsedConfig.layout || 'default';
+    
+    // end handle file-level configuration
 
     const layoutPath = path.resolve(baseFrameDir, 'layouts', layout + '.html');
     let layoutText = '${o.content}'

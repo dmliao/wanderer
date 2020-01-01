@@ -67,7 +67,7 @@ There's three layers of configuration: site-wide, directory-level, and individua
 
 Site-wide configuration is passed into the builder function, and is typically found in `config.toml` in the base directory where wanderer is run.
 
-Directory-level configuration is written in a `_.toml` file in a content directory. This file isn't copied over to the build directory, but rather added to the configuration for that directory only. It does not apply to sub-directories.
+Directory-level configuration is written in a `_.toml` file in a content directory. This file isn't copied over to the build directory, but rather added to the configuration for that directory only. It recursively applies to sub-directories.
 
 Every built (so `.md` for now) content file can also add configuration by starting the file with `---`, adding toml-frontmatter, and ending the frontmatter with `---`
 
