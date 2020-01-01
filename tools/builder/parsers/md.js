@@ -7,13 +7,14 @@ const parseFrontmatter = require('../utils/parse-frontmatter')
 const findStatics = require('../utils/find-statics')
 const createPrettyUrlPage = require('../utils/create-pretty-url-page')
 
-const buildMarkdownFile = (sourceFilePath, targetDirPath, processedFilename, baseFrameDir, config) => {
+const buildMarkdownFile = (sourceFilePath, targetDirPath, processedFilename, baseFrameDir, dirConfig) => {
     const sourceText = fs.readFileSync(sourceFilePath, 'utf-8');
 
     // check for frontmatter
     const parsedText = parseFrontmatter(sourceText);
 
-    const parsedConfig = {...config, ...parsedText.config};
+    const parsedConfig = { ...dirConfig, ...parsedText.config };
+    processedFilename = parsedConfig.url || processedFilename;
 
     // find the layout
     const layout = parsedConfig.layout || 'default';
@@ -31,23 +32,27 @@ const buildMarkdownFile = (sourceFilePath, targetDirPath, processedFilename, bas
     const parser = harpe();
     const html = parser.parse(parsedText.text);
     const templatedHTML = template(layoutText,
-    {
-        // adds page-specific css and js
-        ...pageStatics,
+        {
+            // adds page-specific css and js
+            ...pageStatics,
 
-        // adds anything from the frontmatter + folder config
-        ...parsedConfig,
+            // adds anything from the frontmatter + folder config
+            ...parsedConfig,
 
-        content: html,
-        _baseDir: baseFrameDir
-    })
+            content: html,
+            _baseDir: baseFrameDir
+        })
 
-    const targetPath = path.resolve(targetDirPath, processedFilename.name + '.html')
+    const targetPath = path.resolve(targetDirPath, processedFilename + '.html')
 
-    createPrettyUrlPage(targetPath, templatedHTML);
+    // we really don't need to create a pretty URL page for an index
+    if (processedFilename !== 'index') {
+        createPrettyUrlPage(targetPath, templatedHTML);
+    } else {
+        // write the file
+        fs.writeFileSync(targetPath, templatedHTML);
+    }
 
-    // write the file
-    fs.writeFileSync(targetPath, templatedHTML);
 }
 
 module.exports = buildMarkdownFile;

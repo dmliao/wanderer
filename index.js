@@ -20,7 +20,7 @@ const frameDir = argv.frame || argv.f || path.resolve(process.cwd(), 'frame')
 const contentDir = argv.in || argv.i || path.resolve(process.cwd(), 'content')
 const buildDir = argv.out || argv.o || path.resolve(process.cwd(), 'build')
 
-let config = {
+let metaConfig = {
     frame: frameDir,
     content: contentDir
 };
@@ -28,10 +28,14 @@ let config = {
 const configFile = argv.config || argv.c || path.resolve(process.cwd(), 'config.toml')
 if (fs.existsSync(configFile)) {
     const extraConfig = toml.parse(fs.readFileSync(path.resolve(process.cwd(), 'config.toml')));
-    config = {...config, ...extraConfig}
+    metaConfig = {...metaConfig, ...extraConfig}
 }
 
 const buildSite = async() => {
+
+    const globalConfig = { ...metaConfig }
+    delete globalConfig.frame
+    delete globalConfig.content
 
     const touchFile = path.resolve(buildDir, '.touchfile')
 
@@ -39,18 +43,18 @@ const buildSite = async() => {
     const staticDir = path.resolve(frameDir, 'static')
 
     if (fs.existsSync(staticDir)) {
-        const staticFiles = await touch(staticDir, touchFile)
+        const staticFiles = await touch(staticDir, globalConfig, touchFile)
 
         for (let file of staticFiles) {
-            build(path.resolve(file.dir, file.file), config, staticDir, config.frame, path.resolve(buildDir, 'static'));
+            build(path.resolve(file.dir, file.file), file.config, staticDir, metaConfig.frame, path.resolve(buildDir, 'static'));
         }
     }
 
     // build the content files
-    const touchedFiles = await touch(config.content, touchFile, true);
+    const touchedFiles = await touch(metaConfig.content, globalConfig, touchFile, true);
 
     for (let file of touchedFiles) {
-        build(path.resolve(file.dir, file.file), config, config.content, config.frame, buildDir);
+        build(path.resolve(file.dir, file.file), file.config, metaConfig.content, metaConfig.frame, buildDir);
     }
 }
 

@@ -49,3 +49,4 @@ Used to further compress PNGs beyond what `sharp` can do. This can be downloaded
 * Figure out a method for handling lists and feeds. We don't want to have to add them to the build for every file, so we'll need some method to add to a specific page that those features are being used. (Probably in page level config.)
     * Lists will also make `touch` a bit more complicated, as any file that pulls content from a different directory will need to be accounted for by touch.
 * Actually use it to build a website - this is mostly in 'thought experiment' level of implementation, and so probably has edge cases I haven't considered
+* Figure out how redirects should work. HTML can create redirects through https://www.w3docs.com/snippets/html/how-to-redirect-a-web-page-in-html.html

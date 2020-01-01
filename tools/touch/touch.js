@@ -1,17 +1,29 @@
 const fs = require('fs');
 const path = require('path');
 const dayjs = require('dayjs');
+const toml = require('toml');
 
-const touch = async (dir, dateToCheck) => {
+const touch = async (dir, globalConfig, dateToCheck) => {
+    let fileConfig = globalConfig || {}
     let files = fs.readdirSync(dir);
     files = await Promise.all(files.map(async file => {
         const filePath = path.join(dir, file);
         const stats = fs.statSync(filePath);
-        if (stats.isDirectory()) return touch(filePath, dateToCheck);
+
+        // find the directory-level config
+        const configFilePath = path.resolve(dir, '_.toml')
+        if (fs.existsSync(configFilePath)) {
+            const dirConfig = toml.parse(fs.readFileSync(configFilePath).toString())
+            fileConfig = { ...globalConfig, ...dirConfig }
+        }
+
+        if (stats.isDirectory()) return touch(filePath, fileConfig, dateToCheck);
         else if(stats.isFile()) {
             if (dayjs(dateToCheck).isBefore(dayjs(stats.mtime))) {
                 // this was touched!
-                return { file: file, dir: dir }
+
+                // TODO: also add the config to this.
+                return { file: file, dir: dir, config: fileConfig }
             }
 
             return undefined;

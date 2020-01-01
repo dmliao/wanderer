@@ -13,8 +13,7 @@ const imageExtensions = ['png', 'jpg']
 const metaExtensions = ['toml']
 const processedEntryExtensions = ['md', 'htm']
 
-const buildFile = (filePath, globalConfig, baseContentDir, baseFrameDir, baseBuildDir) => {
-    const dir = path.dirname(filePath);
+const buildFile = (filePath, dirConfig, baseContentDir, baseFrameDir, baseBuildDir) => {
     const file = path.basename(filePath);
     
     const filePathDetails = splitFilePath(file);
@@ -24,33 +23,31 @@ const buildFile = (filePath, globalConfig, baseContentDir, baseFrameDir, baseBui
         return;
     }
 
-    let config = {...globalConfig};
-    
-    // get the folder-wide meta
-    if (fs.existsSync(path.resolve(dir, '_.toml'))) {
-        const tomlPathMeta = toml.parse(fs.readFileSync(path.resolve(dir, '_.toml'), 'utf-8'));
-        config = { ...config, ...tomlPathMeta }
+    let config = {...dirConfig};
+
+    // short circuit if private = true
+    if (config.private && config.private === true) {
+        return;
     }
+    
+    const defaultTargetPath = path.resolve(baseBuildDir, path.relative(baseContentDir, filePath));
+    const defaultTargetDir = path.dirname(defaultTargetPath);
 
-    const targetPath = path.resolve(baseBuildDir, path.relative(baseContentDir, filePath));
-    const targetDir = path.dirname(targetPath);
+    let defaultProcessedFileObject = processFilename(filePathDetails.name);
+    const tempoString = defaultProcessedFileObject.tempo;
+    config.date = tempoString
 
-    // TODO: modify targetDir here if we want to obfuscate it for whatever reason.
-    // e.g. if we have a folder-wide config 
+    // Determine whether we should change file paths from config
+    const targetDir = config.dir ? path.resolve(baseBuildDir, config.dir) : defaultTargetDir
+    const processedFilename = defaultProcessedFileObject.name;
     
     if (!fs.existsSync(targetDir)) {
         fs.mkdirSync(targetDir, { recursive: true })
     }
 
-    let p = processFilename(filePathDetails.name);
-    const tempoString = p.tempo;
-    const processedFilename = p.name;
-
     // image
     if (imageExtensions.indexOf(filePathDetails.ext.toLowerCase()) >= 0) {
-        // TODO: do some extra image processing.
         processImage(filePath, path.resolve(targetDir, processedFilename + '.' + filePathDetails.ext))
-        // buildStaticFile(filePath, path.resolve(targetDir, processedFilename + '.' + filePathDetails.ext));
         return;
     }
 
@@ -62,7 +59,7 @@ const buildFile = (filePath, globalConfig, baseContentDir, baseFrameDir, baseBui
 
     // markdown
     if (filePathDetails.ext === 'md') {
-        buildMarkdownFile(filePath, targetDir, p, baseFrameDir, config);
+        buildMarkdownFile(filePath, targetDir, processedFilename, baseFrameDir, config);
     }
 
     // htm
