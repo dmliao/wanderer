@@ -236,7 +236,7 @@ const harpe = options => {
             continue;
           case "hr":
             if (line.trim() === '---') {
-                finalString += '</hr>\n'
+                finalString += '<hr />\n'
                 continue;
             }
             

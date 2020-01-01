@@ -25,7 +25,7 @@ const buildMarkdownFile = (sourceFilePath, targetDirPath, processedFilename, bas
 
     // find the layout
     const layout = parsedConfig.layout || 'default';
-    
+
     // end handle file-level configuration
 
     const layoutPath = path.resolve(baseFrameDir, 'layouts', layout + '.html');
@@ -40,6 +40,7 @@ const buildMarkdownFile = (sourceFilePath, targetDirPath, processedFilename, bas
     // parse and generate the template
     const parser = harpe();
     const html = parser.parse(parsedText.text);
+    const parsedHTML = template(html, parsedConfig)
     const templatedHTML = template(layoutText,
         {
             // adds page-specific css and js
@@ -48,7 +49,7 @@ const buildMarkdownFile = (sourceFilePath, targetDirPath, processedFilename, bas
             // adds anything from the frontmatter + folder config
             ...parsedConfig,
 
-            content: html,
+            content: parsedHTML,
             _baseDir: baseFrameDir
         })
 

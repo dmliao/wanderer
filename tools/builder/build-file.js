@@ -1,7 +1,7 @@
 const fs = require('fs')
 const path = require('path');
-const toml = require('toml');
 
+const tempo = require('../tempo/index')
 const splitFilePath = require('./utils/split-filepath')
 const processFilename = require('./utils/process-tempo-filename')
 
@@ -35,7 +35,9 @@ const buildFile = (filePath, dirConfig, baseContentDir, baseFrameDir, baseBuildD
 
     let defaultProcessedFileObject = processFilename(filePathDetails.name);
     const tempoString = defaultProcessedFileObject.tempo;
-    config.date = tempoString
+    const fileDate = tempoString ? tempo.parse(tempoString) : new Date();
+
+    config.date = fileDate.toDateString();
 
     // Determine whether we should change file paths from config
     const targetDir = config.dir ? path.resolve(baseBuildDir, config.dir) : defaultTargetDir
