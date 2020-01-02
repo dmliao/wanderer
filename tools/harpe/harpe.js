@@ -155,6 +155,7 @@ const harpe = options => {
       // global vars
       let finalString = "";
       let isInCode = false;
+      let isInHTMLElement = false;
       let previousBlock = undefined;
       let needsWrap = false;
   
@@ -195,6 +196,7 @@ const harpe = options => {
       };
   
       for (let line of lines) {
+        line = line.trim()
         if (isInCode) {
           if (line.startsWith("```")) {
             finalString += codeBlockTags[1] + "\n";
@@ -202,6 +204,16 @@ const harpe = options => {
             continue;
           }
           finalString += line + "\n";
+          continue;
+        }
+
+        if (isInHTMLElement) {
+          if (line.endsWith('>')) {
+            finalString += line + '\n'
+            isInHTMLElement = false;
+            continue
+          }
+          finalString += line + '\n'
           continue;
         }
   
@@ -260,6 +272,15 @@ const harpe = options => {
         }
   
         if (processedBlock) {
+          continue;
+        }
+
+        // HTML tags
+        if (line.startsWith('<')) {
+          if (!line.endsWith('>')) {
+            isInHTMLElement = true;
+          }
+          finalString += line + '\n';
           continue;
         }
   
