@@ -30,8 +30,9 @@ const harpe = options => {
       "# ": { tag: "h1", _p: 1 },
       "## ": { tag: "h2", _p: 2 },
       "### ": { tag: "h3", _p: 3 },
-      "* ": { tag: "li", wrap: 'ul', _p: 4 },
-      "> ": { tag: "blockquote", _p: 5 }
+      "\\* ": { tag: "li", wrap: 'ul', _p: 4 },
+      "> ": { tag: "blockquote", _p: 5 },
+      "[0-9]+. ": { tag: "li", wrap: 'ol', _p: 4},
     };
   
     /*
@@ -109,6 +110,10 @@ const harpe = options => {
     const wrapReplace = (text, replace) => {
       const processedText = parseInlineRegex(text);
       return replace.replace('$1', processedText);
+    }
+
+    const escapeHTML = (text) => {
+      return text.replace('&', '&amp;').replace('<', '&lt;');
     }
   
     // public API
@@ -196,16 +201,17 @@ const harpe = options => {
       };
   
       for (let line of lines) {
-        line = line.trim()
         if (isInCode) {
           if (line.startsWith("```")) {
             finalString += codeBlockTags[1] + "\n";
             isInCode = false;
             continue;
           }
-          finalString += line + "\n";
+          finalString += escapeHTML(line) + "\n";
           continue;
         }
+
+        line = line.trim()
 
         if (isInHTMLElement) {
           if (line.endsWith('>')) {
@@ -257,15 +263,19 @@ const harpe = options => {
         // now we check if it's a regular block
         let processedBlock = false;
         for (let b in blockTypes) {
-          if (!line.startsWith(b)) {
+          const regexBlock = new RegExp('^' + b)
+
+          if (!regexBlock.test(line)) {
             continue;
           }
+
+          const matchedToken = regexBlock.exec(line)[0]
   
           const tagDefinition = blockTypes[b];
           if (tagDefinition.wrap) {
             openTag(tagDefinition.wrap);
           }
-          const textWithoutRune = line.slice(b.length);
+          const textWithoutRune = line.slice(matchedToken.length);
           finalString += wrap(textWithoutRune, tagDefinition.open || `<${tagDefinition.tag}>`, tagDefinition.close || `</${tagDefinition.tag}>`) + "\n";
           processedBlock = true;
           break;
@@ -294,7 +304,6 @@ const harpe = options => {
       if (options.verbose) {
         console.timeEnd('harpe')
       }
-  
       return finalString;
     };
   

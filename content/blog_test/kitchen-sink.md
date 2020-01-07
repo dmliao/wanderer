@@ -17,6 +17,15 @@ De est vertisse comae carpsit umbras Messenia, est pignore deorum. Egressus et o
 * Arboreis breviore recondidit
 * Colebat fuit spatium
 
+Ordered lists.
+
+1. Sua una
+2. Finxit oculos
+3. Amborum vehit
+4. Colebat vestrae est verus dat cumque hospite
+5. Arboreis breviore recondidit
+6. Colebat fuit spatium 
+
 ## Commune dura urbis
 
 Bibes ardet: fatis promissa nec; tot curae absentem dummodo inopino in milite moverat obit. Sed sit capillis adiacet cecidit, aliquid ponitur Lycormas ullas retia facerent formae arbiter; sub causa erat iura. Pervenit supplex? Septem contigit, in periclo festum boum, vi dolor [Iulius Argo](http://finierat-amor.io/dantducit.html). Minuit axe crine aut amissa, formam super animi aeterna adgreditur.
