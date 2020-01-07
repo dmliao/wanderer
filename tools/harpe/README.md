@@ -41,6 +41,9 @@ Even single linebreaks are treated as paragraphs.
 * Note that because of the block restriction of 'wrap whole line', there are no sublists.
 * I''ll work on that if I ever need it!
 
+1. Ordered lists.
+2. They're not very smart, so you can start with any number.
+
 | table heading | description
 | Tables | also work
 | with the first row | being the heading.
