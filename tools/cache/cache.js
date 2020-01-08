@@ -4,9 +4,8 @@ const path = require('path')
 const frontmatter = require('../frontmatter/index')
 
 class Cache {
-    constructor(cacheDir, contentDir) {
+    constructor(cacheDir) {
         this.cacheDir = path.resolve(cacheDir)
-        this.contentDir = path.resolve(contentDir)
 
         this.pageCachePath = path.join(this.cacheDir, 'pages.json')
         if (fs.existsSync(this.pageCachePath)) {
@@ -37,18 +36,47 @@ class Cache {
 
             const content = frontmatter(fs.readFileSync(filePath, 'utf-8'))
             content.config = {...file.config, ...content.config}
-            content.page = path.relative(this.contentDir, filePath)
 
-            this.pageCache.merge(content, "page")
+            // TODO: we need to have run tempo by now to get the proper dates for prefixed posts.
+            content.date = content.config.date
+            content.id = file.id
+            content.sourceDir = path.dirname(file.id)
+
+            this.pageCache.merge(content, "id")
         }
     }
 
     db(query) {
         return this.pageCache(query)
     }
+    
+    global() {
+        return this.pageCache
+    }
 
-    getPage(relativePath) {
-        return this.pageCache({ page: relativePath })
+    getPage(id) {
+        const pages = JSON.parse(this.pageCache({ id: id }).limit(1).stringify())
+        if (!pages.length) {
+            return undefined
+        }
+        return pages[0]
+    }
+
+    getFeed({query, sortBy, isAscending, limit, pageNumber }) {
+        if (!query) {
+            throw new Error('no query?');
+        }
+
+        sortBy = sortBy || 'date'
+        const sortType = isAscending ? 'asec' : 'desc'
+        limit = limit || 1000 // if a site goes over this number we're really in trouble
+        pageNumber = pageNumber || 0 // 0 indexed
+        const pages = JSON.parse(this.pageCache(query)
+            .limit(limit)
+            .start(limit * pageNumber)
+            .order(sortBy + ' ' + sortType).stringify())
+        
+        return pages
     }
 }
 

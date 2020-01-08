@@ -1,13 +1,15 @@
 const fs = require('fs');
 const path = require('path');
+const harpe = require('../harpe/harpe')
 
 const render = (template, config, layer) => {
     layer = layer || 0;
     if (layer > 10) {
+        console.log(template)
         throw new Error("More than 10 nested imports discovered. Either you have a very deep import tree (please don't), or there's a circular import, which is not supported.")
     }
     
-    const escapedTemplate = template.replace('`', '\\`');
+    const escapedTemplate = template;
 
     const o = {...config};
     const premadePartials = config._partials || {};
@@ -61,16 +63,27 @@ const render = (template, config, layer) => {
     // end imports
 
     const unparsedPartials = {...premadePartials, ...importedPartials};
+
+    // we add all the partials to the config object so that any nested renders also contain
+    // the list of partials
+    o._partials = unparsedPartials
+
     const partials = {}
     for (let key of Object.keys(unparsedPartials)) {
         const p = unparsedPartials[key]
 
-        partials[key] = render(p, o, layer + 1);
+        // only parse a partial if it's used in the file
+        if (template.indexOf('partials.' + key) > -1) {
+            partials[key] = render(p, o, layer + 1);
+        }
+        
     }
 
+    // macros let you use partials and feed specific variables into them
     const macro = (partialName, vars) => {
         const macroConfig = {
-            ...vars
+            ...vars,
+            _partials: unparsedPartials
         };
 
         if (typeof partialName !== 'string') {
@@ -79,6 +92,16 @@ const render = (template, config, layer) => {
 
         const partialValue = unparsedPartials[partialName] || partialName;
         return render(partialValue, macroConfig, layer + 1);
+    }
+
+    const md = (text) => {
+        const parser = harpe();
+        return parser.parse(text)
+    }
+
+    const templ = (text, optionalConfig) => {
+        optionalConfig = optionalConfig || {}
+        return render(text, { ...o, ...optionalConfig }, layer + 1)
     }
 
     // create proper config file

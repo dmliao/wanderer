@@ -1,12 +1,13 @@
 import head from './partials/head.html'
 import scripts from './partials/scripts.html'
+import post from './partials/post.html'
 
 <!DOCTYPE html>
 <html>
   ${partials.head}
   <body>
     <section id="main">
-        ${o.content}
+        ${templ(o.content)}
     </section>
     
     ${partials.scripts}

@@ -2,7 +2,6 @@ const fs = require('fs')
 const path = require('path');
 
 const tempo = require('../tempo/index')
-const splitFilePath = require('./utils/split-filepath')
 const processFilename = require('./utils/process-tempo-filename')
 
 const buildMarkdownFile = require('./parsers/md')
@@ -13,27 +12,36 @@ const imageExtensions = ['png', 'jpg']
 const metaExtensions = ['toml']
 const processedEntryExtensions = ['md', 'htm']
 
-const buildFile = (filePath, dirConfig, baseContentDir, baseFrameDir, baseBuildDir) => {
-    const file = path.basename(filePath);
-    
-    const filePathDetails = splitFilePath(file);
+// cache is optional. If a cache is not provided, we'll create a temporary one
+const buildFile = (touchedFile, baseContentDir, baseFrameDir, baseBuildDir, cache) => {
+    const filePath = path.resolve(touchedFile.dir, touchedFile.file)
+
+    const filename = path.parse(touchedFile.file).name
+    const ext = path.parse(touchedFile.file).ext.slice(1)
+
+    const pagePath = path.relative(baseContentDir, filePath)
 
     // ignore meta files
-    if (metaExtensions.indexOf(filePathDetails.ext) >= 0) {
+    if (metaExtensions.indexOf(ext) >= 0) {
         return;
     }
 
-    let config = {...dirConfig};
+    let config = touchedFile.config
 
     // short circuit if private = true
     if (config.private && config.private === true) {
         return;
     }
     
-    const defaultTargetPath = path.resolve(baseBuildDir, path.relative(baseContentDir, filePath));
+    const defaultTargetPath = path.resolve(baseBuildDir, pagePath);
     const defaultTargetDir = path.dirname(defaultTargetPath);
 
-    let defaultProcessedFileObject = processFilename(filePathDetails.name);
+    // TODO: all editing of config should definitely be happening earlier.
+    // This should probably actually go into touch, since every single file should have this processing happen
+    // at some point
+    // START EXTREMELY SPOONY CODE
+    
+    let defaultProcessedFileObject = processFilename(filename);
     const tempoString = defaultProcessedFileObject.tempo;
     const fileDate = tempoString ? tempo.parse(tempoString) : new Date();
 
@@ -42,33 +50,43 @@ const buildFile = (filePath, dirConfig, baseContentDir, baseFrameDir, baseBuildD
     // Determine whether we should change file paths from config
     const targetDir = config.dir ? path.resolve(baseBuildDir, config.dir) : defaultTargetDir
     const processedFilename = defaultProcessedFileObject.name;
+
+    // pass this into config
+    config.pageName = processedFilename;
+
+    // TODO: remove this when we don't need to update cache anymore
+    const page = cache.getPage(touchedFile.id)
+    const mergedConfig = { ...page.config, ...config }
+    cache.global().merge({ config: mergedConfig, id: touchedFile.id }, "id")
+
+    // END EXTREMELY SPOONY CODE
     
     if (!fs.existsSync(targetDir)) {
         fs.mkdirSync(targetDir, { recursive: true })
     }
 
     // image
-    if (imageExtensions.indexOf(filePathDetails.ext.toLowerCase()) >= 0) {
-        processImage(filePath, path.resolve(targetDir, processedFilename + '.' + filePathDetails.ext))
+    if (imageExtensions.indexOf(ext.toLowerCase()) >= 0) {
+        processImage(filePath, path.resolve(targetDir, processedFilename + '.' + ext))
         return;
     }
 
-    if (processedEntryExtensions.indexOf(filePathDetails.ext.toLowerCase()) < 0) {
+    if (processedEntryExtensions.indexOf(ext.toLowerCase()) < 0) {
         // it's static. We copy over the file without doing anything (though we do strip tempo dates if needed)
-        buildStaticFile(filePath, path.resolve(targetDir, processedFilename + '.' + filePathDetails.ext));
+        buildStaticFile(filePath, path.resolve(targetDir, processedFilename + '.' + ext));
         return;
     }
 
     // markdown
-    if (filePathDetails.ext === 'md') {
-        buildMarkdownFile(filePath, targetDir, processedFilename, baseFrameDir, config);
+    if (ext === 'md') {
+        buildMarkdownFile(touchedFile, targetDir, baseFrameDir, cache);
     }
 
     // htm
 
     // html
-    if (filePathDetails.ext === 'html') {
-        buildStaticFile(filePath, path.resolve(targetDir, processedFilename + '.' + filePathDetails.ext));
+    if (ext === 'html') {
+        buildStaticFile(filePath, path.resolve(targetDir, processedFilename + '.' + ext));
         return;
     }
 }

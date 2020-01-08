@@ -1,7 +1,6 @@
 const fs = require('fs');
 const path = require('path');
 
-const splitFilePath = require('./split-filepath')
 const processFilename = require('./process-tempo-filename')
 
 // given a filepath, return all of the other files in the same folder with the same 'basename'
@@ -12,7 +11,7 @@ const findStatics = (filePath) => {
     const dir = path.dirname(filePath);
     const filename = path.basename(filePath);
 
-    let processedName = processFilename(splitFilePath(filename).name).name;
+    let processedName = processFilename(path.parse(filename).name).name;
     const statics = {}
 
     const dirFiles = fs.readdirSync(dir);
@@ -22,14 +21,13 @@ const findStatics = (filePath) => {
             continue;
         }
 
-        const splitFile = splitFilePath(f);
+        let fProcessedName = processFilename(path.parse(f).name).name;
+        let ext = path.extname(filePath).slice(1)
 
-        let fProcessedName = processFilename(splitFile.name).name;
-
-        const staticPath = './' + splitFile.name + '.' + splitFile.ext;
+        const staticPath = './' + filename;
 
         if (fProcessedName === processedName) {
-            switch (splitFile.ext) {
+            switch (ext) {
                 case 'css':
                     statics.css = staticPath
                 break;

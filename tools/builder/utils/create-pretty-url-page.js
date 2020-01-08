@@ -2,8 +2,6 @@ const path = require('upath')
 const fs = require('fs')
 const parser = require('himalaya')
 
-const splitFilepath = require('./split-filepath')
-
 const urlXPath = `//a/@href 
 | //applet/@codebase 
 | //area/@href 
@@ -108,11 +106,11 @@ const createHTMLWithParentedRelativeLinks = (htmlOfTarget) => {
 
 const createPrettyUrlPage = (targetPath, htmlOfTarget) => {
     const targetDir = path.dirname(targetPath);
-    const splitPath = splitFilepath(path.basename(targetPath))
+    const filename = path.parse(path.basename(targetPath)).name
 
     const newHTML = createHTMLWithParentedRelativeLinks(htmlOfTarget);
 
-    const targetDirPretty = path.resolve(targetDir, splitPath.name)
+    const targetDirPretty = path.resolve(targetDir, filename)
 
     if (!fs.existsSync(targetDirPretty)) {
         fs.mkdirSync(targetDirPretty, { recursive: true });

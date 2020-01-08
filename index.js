@@ -7,7 +7,7 @@ var argv = require('minimist')(process.argv.slice(2));
 const touch = require('./tools/touch/index')
 const build = require('./tools/builder/index')
 
-const processImage = require('./tools/image-processor')
+const Cache = require('./tools/cache/cache')
 
 console.time('build');
 
@@ -22,8 +22,6 @@ const buildDir = argv.out || argv.o || path.resolve(process.cwd(), 'build')
 const cacheDir = argv.out || argv.o || path.resolve(process.cwd(), '.cache')
 
 let metaConfig = {
-    frame: frameDir,
-    content: contentDir
 };
 
 const configFile = argv.config || argv.c || path.resolve(process.cwd(), 'config.toml')
@@ -35,8 +33,6 @@ if (fs.existsSync(configFile)) {
 const buildSite = async() => {
 
     const globalConfig = { ...metaConfig }
-    delete globalConfig.frame
-    delete globalConfig.content
 
     const touchFile = path.resolve(buildDir, '.touchfile')
 
@@ -45,18 +41,27 @@ const buildSite = async() => {
 
     if (fs.existsSync(staticDir)) {
         const staticFiles = await touch(staticDir, globalConfig, touchFile)
+        const staticCache = new Cache(path.resolve(cacheDir, 'static'), frameDir)
+        staticCache.update(staticFiles)
 
         for (let file of staticFiles) {
-            build(path.resolve(file.dir, file.file), file.config, staticDir, metaConfig.frame, path.resolve(buildDir, 'static'));
+            build(file, staticDir, frameDir, path.resolve(buildDir, 'static'), staticCache);
         }
+
+        staticCache.save()
     }
 
     // build the content files
-    const touchedFiles = await touch(metaConfig.content, globalConfig, touchFile, true);
+    const touchedFiles = await touch(contentDir, globalConfig, touchFile, true);
+
+    const cache = new Cache(cacheDir, contentDir)
+    cache.update(touchedFiles)
 
     for (let file of touchedFiles) {
-        build(path.resolve(file.dir, file.file), file.config, metaConfig.content, metaConfig.frame, buildDir);
+        build(file, contentDir, frameDir, buildDir, cache);
     }
+
+    cache.save()
 }
 
 buildSite().then(() => console.timeEnd('build'))

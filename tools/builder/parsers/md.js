@@ -1,32 +1,60 @@
 const fs = require('fs')
-const path = require('path')
+const path = require('upath')
 const harpe = require('../../harpe/harpe')
 const template = require('../../template/index')
 
-const parseFrontmatter = require('../../frontmatter/index')
 const findStatics = require('../utils/find-statics')
 const createPrettyUrlPage = require('../utils/create-pretty-url-page')
 
-const buildMarkdownFile = (sourceFilePath, targetDirPath, processedFilename, baseFrameDir, dirConfig) => {
-    const sourceText = fs.readFileSync(sourceFilePath, 'utf-8');
+const buildMarkdownFile = (touchedFile, targetDirPath, baseFrameDir, cache) => {
 
-    // check for frontmatter
-    const parsedText = parseFrontmatter(sourceText);
+    const sourceFilePath = path.resolve(touchedFile.dir, touchedFile.file)
+    let pageObject = cache.getPage(touchedFile.id)
 
-    const parsedConfig = { ...dirConfig, ...parsedText.config };
+    if (!pageObject) {
+        cache.update([touchedFile])
+        pageObject = cache.getPage(touchedFile.id)
+    }
+    
+    const parsedConfig = pageObject.config;
 
     // handle file-level configuration
+    ///////////////////////////////////
+
     if (parsedConfig.private && parsedConfig.private === true) {
         // skip this, since it's a private file
         return;
     }
 
-    processedFilename = parsedConfig.rename || processedFilename;
+    processedFilename = parsedConfig.rename || parsedConfig.pageName;
+
+    // generate all of the feeds
+    //////////////////////////////
+    const feeds = {}
+    if (parsedConfig.feeds) {
+        for (let feedName of Object.keys(parsedConfig.feeds)) {
+            const feed = parsedConfig.feeds[feedName]
+            // if the feed query is a string, we need to generate a query from it
+            const rawQuery = feed.query
+            let query
+
+            if (typeof rawQuery === 'string') {
+                const relativeDir = path.join(pageObject.sourceDir, rawQuery)
+                query = { sourceDir: relativeDir }
+            }
+
+            feeds[feedName] = cache.getFeed({ query })
+        }
+    }
+
+    // end feed generation
+    //////////////////////
 
     // find the layout
     const layout = parsedConfig.layout || 'default';
 
     // end handle file-level configuration
+    ////////////////////////////////////////
 
     const layoutPath = path.resolve(baseFrameDir, 'layouts', layout + '.html');
     let layoutText = '${o.content}'
@@ -38,25 +66,29 @@ const buildMarkdownFile = (sourceFilePath, targetDirPath, processedFilename, bas
     const pageStatics = findStatics(sourceFilePath)
 
     // parse and generate the template
+    ////////////////////////////////////
+
     const parser = harpe();
-    const html = parser.parse(parsedText.text);
-    const parsedHTML = template(html, parsedConfig)
-    const templatedHTML = template(layoutText,
-        {
-            // adds page-specific css and js
-            ...pageStatics,
+    const html = parser.parse(pageObject.text)
 
-            // adds anything from the frontmatter + folder config
-            ...parsedConfig,
+    const templateVars = {
+        // adds page-specific css and js
+        ...pageStatics,
 
-            content: parsedHTML,
-            _baseDir: baseFrameDir
-        })
+        // adds anything from the frontmatter + folder config
+        ...parsedConfig,
+        feeds,
+        content: html,
+        _baseDir: baseFrameDir
+    }
+    // second html pass: add layouts and additional partials to the content
+    const templatedHTML = template(layoutText, templateVars)
 
     const targetPath = path.resolve(targetDirPath, processedFilename + '.html')
 
     // we really don't need to create a pretty URL page for an index
     if (processedFilename !== 'index') {
+        
         createPrettyUrlPage(targetPath, templatedHTML);
     } else {
         // write the file
