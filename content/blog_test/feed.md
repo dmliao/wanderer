@@ -18,3 +18,11 @@ ${o.feeds.posts.map(post => {
     })
 }).join('\n')}
 ```
+
+```
+${o.feeds.posts.map(post => {
+    return md(`
+# ${post.config.title}
+${post.config.description}
+`)
+}).join('\n')}
