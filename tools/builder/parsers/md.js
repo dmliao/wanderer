@@ -3,7 +3,7 @@ const path = require('path')
 const harpe = require('../../harpe/harpe')
 const template = require('../../template/index')
 
-const parseFrontmatter = require('../utils/parse-frontmatter')
+const parseFrontmatter = require('../../frontmatter/index')
 const findStatics = require('../utils/find-statics')
 const createPrettyUrlPage = require('../utils/create-pretty-url-page')
 

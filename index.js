@@ -19,6 +19,7 @@ if (argv.h || argv.help) {
 const frameDir = argv.frame || argv.f || path.resolve(process.cwd(), 'frame')
 const contentDir = argv.in || argv.i || path.resolve(process.cwd(), 'content')
 const buildDir = argv.out || argv.o || path.resolve(process.cwd(), 'build')
+const cacheDir = argv.out || argv.o || path.resolve(process.cwd(), '.cache')
 
 let metaConfig = {
     frame: frameDir,

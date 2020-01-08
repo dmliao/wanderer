@@ -1,6 +1,6 @@
 const toml = require('toml')
 
-const parseFrontmatter = (text) => {
+const frontmatter = (text) => {
     if (!text.startsWith('---')) {
         return {
             config: {},
@@ -27,4 +27,4 @@ const parseFrontmatter = (text) => {
     return result;
 }
 
-module.exports = parseFrontmatter;
+module.exports = frontmatter
