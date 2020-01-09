@@ -1,5 +1,5 @@
 const toml = require('toml');
-const path = require('path');
+const path = require('upath');
 const fs = require('fs');
 
 var argv = require('minimist')(process.argv.slice(2));

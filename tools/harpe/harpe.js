@@ -106,14 +106,10 @@ const harpe = options => {
       const processedText = parseInlineRegex(text);
       return `${before}${processedText}${after}`;
     };
-  
-    const wrapReplace = (text, replace) => {
-      const processedText = parseInlineRegex(text);
-      return replace.replace('$1', processedText);
-    }
 
     const escapeHTML = (text) => {
-      return text.replace('&', '&amp;').replace('<', '&lt;');
+      // escape $ is necessary since otherwise ${} inside a code tag will turn into a template literal
+      return text.replace('&', '&amp;').replace('<', '&lt;').replace('$', '\\$');
     }
   
     // public API

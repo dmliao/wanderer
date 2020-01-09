@@ -1,6 +1,6 @@
 const TAFFY = require('taffydb').taffy;
 const fs = require('fs')
-const path = require('path')
+const path = require('upath')
 const frontmatter = require('../frontmatter/index')
 
 class Cache {
@@ -27,15 +27,18 @@ class Cache {
         const textFiles = ['md', 'htm']
         for (let file of touchedFiles) {
             const ext = path.extname(file.file).toLowerCase().slice(1)
-
             if (textFiles.indexOf(ext) < 0) {
                 continue;
             }
 
-            const filePath = path.join(file.dir, file.file)
+            const filePath = path.resolve(file.dir, file.file)
 
             const content = frontmatter(fs.readFileSync(filePath, 'utf-8'))
             content.config = {...file.config, ...content.config}
+
+            if (content.config.private && content.config.private === true) {
+                continue;
+            }
 
             // TODO: we need to have run tempo by now to get the proper dates for prefixed posts.
             content.date = content.config.date

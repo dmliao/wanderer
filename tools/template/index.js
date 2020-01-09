@@ -100,17 +100,21 @@ const render = (template, config, layer) => {
 
     // dumbly loop through any nested template strings to get the final result.
     // this may be useful if you decide to nest a second template string into a map or a function
-    const moreTemplateStrings = /\${(.|\s)+}/gm
+
+    // harpe escapes $ characters in code tags as \$, so we want to not match those when we determine
+    // whether to do another pass on the template
+    const moreTemplateStrings = /^(?!.*\\\${).*\${/gm
     let currentString = processedTemplate
     let renderLayers = 0
-    while (moreTemplateStrings.test(currentString) === true) {
+    while (moreTemplateStrings.test(currentString) === true && currentString.indexOf('}') > -1) {
         renderLayers += 1
         if (renderLayers > 10) {
             throw new Error("More than 10 nested imports discovered. Either you have a very deep import tree (please don't), or there's a circular import, which is not supported.")
         }
         currentString = eval('`' + currentString + '`')
     }
-    return currentString
+
+    return currentString.replace('\\$', '$')
 }
 
 module.exports = render;

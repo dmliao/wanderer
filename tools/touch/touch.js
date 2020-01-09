@@ -17,6 +17,10 @@ const touchRecursive = async (baseDir, dir, globalConfig, dateToCheck) => {
             fileConfig = { ...globalConfig, ...dirConfig }
         }
 
+        if (fileConfig.private && fileConfig.private === true) {
+            return;
+        }
+
         if (stats.isDirectory()) return touchRecursive(baseDir, filePath, fileConfig, dateToCheck);
         else if(stats.isFile()) {
             if (dayjs(dateToCheck).isBefore(dayjs(stats.mtime))) {
@@ -24,7 +28,7 @@ const touchRecursive = async (baseDir, dir, globalConfig, dateToCheck) => {
 
                 const id = path.relative(baseDir, path.resolve(dir, file))
 
-                return { id: id, file: file, dir: dir, config: fileConfig }
+                return { id: id, file: file, dir: path.resolve(dir), config: fileConfig }
             }
 
             return undefined;

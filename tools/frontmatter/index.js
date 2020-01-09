@@ -17,14 +17,21 @@ const frontmatter = (text) => {
     }
 
     splits.shift();
-    const frontmatter = toml.parse(splits.shift());
+    const rawFrontmatter = splits.shift()
+    try {
+        const frontmatter = toml.parse(rawFrontmatter);
 
-    const result = {
-        config: frontmatter,
-        text: splits.join('---')
+        const result = {
+            config: frontmatter,
+            text: splits.join('---')
+        }
+
+        return result;
+    } catch (e) {
+        console.log(e)
+        return undefined
     }
-
-    return result;
+    
 }
 
 module.exports = frontmatter
