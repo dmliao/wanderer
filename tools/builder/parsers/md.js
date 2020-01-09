@@ -81,6 +81,7 @@ const buildMarkdownFile = (touchedFile, targetDirPath, baseFrameDir, cache) => {
         content: html,
         _baseDir: baseFrameDir
     }
+
     // second html pass: add layouts and additional partials to the content
     const templatedHTML = template(layoutText, templateVars)
 

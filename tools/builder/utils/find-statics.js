@@ -10,7 +10,7 @@ const processFilename = require('./process-tempo-filename')
 const findStatics = (filePath) => {
     const dir = path.dirname(filePath);
     const filename = path.basename(filePath);
-
+    
     let processedName = processFilename(path.parse(filename).name).name;
     const statics = {}
 
@@ -24,7 +24,7 @@ const findStatics = (filePath) => {
         let fProcessedName = processFilename(path.parse(f).name).name;
         let ext = path.extname(filePath).slice(1)
 
-        const staticPath = './' + filename;
+        const staticPath = './' + f;
 
         if (fProcessedName === processedName) {
             switch (ext) {
