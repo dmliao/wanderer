@@ -80,6 +80,7 @@ const buildFile = (touchedFile, baseContentDir, baseFrameDir, baseBuildDir, cach
     // markdown
     if (ext === 'md') {
         buildMarkdownFile(touchedFile, targetDir, baseFrameDir, cache);
+        return
     }
 
     // htm
