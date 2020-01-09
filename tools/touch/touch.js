@@ -37,7 +37,7 @@ const touchRecursive = async (baseDir, dir, globalConfig, dateToCheck) => {
 const touch = async (dir, globalConfig, dateToCheck) => {
     
     const files = await touchRecursive(dir, dir, globalConfig, dateToCheck)
-    const flats = files.reduce((all, folderContents) => all.concat(folderContents), []);
+    const flats = files.flat(Infinity);
     const processedFiles = [];
     for (let file of flats) {
         if (file) {

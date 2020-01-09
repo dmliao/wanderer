@@ -56,9 +56,11 @@ const buildFile = (touchedFile, baseContentDir, baseFrameDir, baseBuildDir, cach
 
     // TODO: remove this when we don't need to update cache anymore
     const page = cache.getPage(touchedFile.id)
-    const mergedConfig = { ...page.config, ...config }
-    cache.global().merge({ config: mergedConfig, id: touchedFile.id }, "id")
-
+    if (page) {
+        const mergedConfig = { ...page.config, ...config }
+        cache.global().merge({ config: mergedConfig, id: touchedFile.id }, "id")    
+    }
+    
     // END EXTREMELY SPOONY CODE
     
     if (!fs.existsSync(targetDir)) {
