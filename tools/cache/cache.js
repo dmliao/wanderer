@@ -34,6 +34,11 @@ class Cache {
             const filePath = path.resolve(file.dir, file.file)
 
             const content = frontmatter(fs.readFileSync(filePath, 'utf-8'))
+
+            if (content.config.private && content.config.private === true) {
+                continue;
+            }
+            
             content.config = {...file.config, ...content.config}
 
             // TODO: we need to have run tempo by now to get the proper dates for prefixed posts.

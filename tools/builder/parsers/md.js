@@ -15,6 +15,13 @@ const buildMarkdownFile = (touchedFile, targetDirPath, baseFrameDir, cache) => {
         cache.update([touchedFile])
         pageObject = cache.getPage(touchedFile.id)
     }
+
+    if (!pageObject) {
+        // we assume at this point that the page is deliberately being uncached, and thus should
+        // short-circuit here
+
+        return;
+    }
     
     const parsedConfig = pageObject.config;
 
