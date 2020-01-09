@@ -22,7 +22,7 @@ const findStatics = (filePath) => {
         }
 
         let fProcessedName = processFilename(path.parse(f).name).name;
-        let ext = path.extname(filePath).slice(1)
+        let ext = path.extname(f).slice(1)
 
         const staticPath = './' + f;
 
