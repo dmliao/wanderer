@@ -50,7 +50,11 @@ const buildMarkdownFile = (touchedFile, targetDirPath, baseFrameDir, cache) => {
                 query = { sourceDir: relativeDir }
             }
 
-            feeds[feedName] = cache.getFeed({ query })
+            feeds[feedName] = cache.getFeed({ 
+                query, 
+                sortBy: feed.sortBy,
+                isAscending: feed.isAscending 
+            })
         }
     }
 
