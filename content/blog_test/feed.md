@@ -10,19 +10,22 @@ limit = 50
 
 This is an index for the folder that contains a feed.
 
-```
+!!!
 ${o.feeds.posts.map(post => {
     return macro('post', {
         title: post.config.title, 
         content: post.config.description
     })
 }).join('\n')}
-```
+!!!
 
-```
+And here is a second way to write a feed:
+
+!!!
 ${o.feeds.posts.map(post => {
     return md(`
-# ${post.config.title}
+# [${post.title}](${post.url})
 ${post.config.description}
 `)
 }).join('\n')}
+!!!

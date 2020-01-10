@@ -42,6 +42,7 @@ const harpe = options => {
       "= ": "comment",
       "| ": "table",
       "```": "code",
+      "!!!": "raw",
       "---": "hr"
     };
   
@@ -155,8 +156,12 @@ const harpe = options => {
   
       // global vars
       let finalString = "";
+
+      // flags to determine overrides
+      let isInRaw = false;
       let isInCode = false;
       let isInHTMLElement = false;
+
       let previousBlock = undefined;
       let needsWrap = false;
   
@@ -197,6 +202,14 @@ const harpe = options => {
       };
   
       for (let line of lines) {
+        if (isInRaw) {
+          if (line.startsWith("!!!")) {
+            isInRaw = false;
+            continue;
+          }
+          finalString += line + '\n';
+          continue;
+        }
         if (isInCode) {
           if (line.startsWith("```")) {
             finalString += codeBlockTags[1] + "\n";
@@ -238,6 +251,9 @@ const harpe = options => {
         switch (type) {
           case "comment":
             continue; // don't do any more processing on this line
+          case "raw":
+            isInRaw = !isInRaw;
+            continue;
           case "code":
             finalString += codeBlockTags[0];
             isInCode = !isInCode;
