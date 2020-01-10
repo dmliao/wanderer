@@ -38,13 +38,33 @@ class Cache {
             if (content.config.private && content.config.private === true) {
                 continue;
             }
-            
+
             content.config = {...file.config, ...content.config}
 
             // TODO: we need to have run tempo by now to get the proper dates for prefixed posts.
             content.date = content.config.date
             content.id = file.id
             content.sourceDir = path.dirname(file.id)
+
+            // get the title
+            if (content.config.title) {
+                content.title = content.config.title
+            } else if (content.text.trim().startsWith('# ')) {
+                content.title = content.text.trim().split(/\r\n|\r|\n/g)[0].slice(2).trim()
+            } else {
+                content.title = file.config.pageName
+            }
+
+            content.config.title = content.title
+
+            // get the URL
+            const pathDir = content.config.dir || content.sourceDir
+            const pathEnd = content.config.rename || content.config.pageName
+            content.url = [pathDir === '.' ? '' : pathDir, pathEnd === 'index' ? '' : pathEnd].join('/')
+
+            if (!content.url.startsWith('/')) {
+                content.url = '/' + content.url
+            }
 
             this.pageCache.merge(content, "id")
         }

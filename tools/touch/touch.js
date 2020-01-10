@@ -3,6 +3,31 @@ const path = require('upath');
 const dayjs = require('dayjs');
 const toml = require('toml');
 
+const processTempoFilename = require('../tempo/process-tempo-filename')
+
+const createTouchedFileObject = (baseDir, dir, file, stats, fileConfig) => {
+    // do first pass of processing since touch is the only time we traverse the directory
+    // and touch all the files
+    const id = path.relative(baseDir, path.resolve(dir, file))
+    const pageTempo = processTempoFilename(path.parse(file).name)
+
+    const newConfig = { ...fileConfig }
+
+    if (pageTempo.date) {
+        newConfig.date = pageTempo.date
+    } else {
+        newConfig.date = stats.mtime
+    }
+
+    newConfig.pageName = pageTempo.name
+    return {
+        id,
+        file,
+        dir: path.resolve(dir),
+        config: newConfig
+    }
+}
+
 const touchRecursive = async (baseDir, dir, globalConfig, dateToCheck) => {
     let fileConfig = globalConfig || {}
     let files = fs.readdirSync(dir);
@@ -22,24 +47,22 @@ const touchRecursive = async (baseDir, dir, globalConfig, dateToCheck) => {
         }
 
         if (stats.isDirectory()) return touchRecursive(baseDir, filePath, fileConfig, dateToCheck);
-        else if(stats.isFile()) {
+        else if (stats.isFile()) {
             if (dayjs(dateToCheck).isBefore(dayjs(stats.mtime))) {
                 // this was touched!
 
-                const id = path.relative(baseDir, path.resolve(dir, file))
-
-                return { id: id, file: file, dir: path.resolve(dir), config: fileConfig }
+                return createTouchedFileObject(baseDir, dir, file, stats, fileConfig)
             }
 
             return undefined;
-        } 
+        }
     }));
 
     return files
 }
 
 const touch = async (dir, globalConfig, dateToCheck) => {
-    
+
     const files = await touchRecursive(dir, dir, globalConfig, dateToCheck)
     const flats = files.flat(Infinity);
     const processedFiles = [];

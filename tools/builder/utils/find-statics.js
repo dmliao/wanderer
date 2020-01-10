@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const processFilename = require('./process-tempo-filename')
+const processFilename = require('../../tempo/process-tempo-filename')
 
 // given a filepath, return all of the other files in the same folder with the same 'basename'
 // CSS and JS files that have the same name as the source HTML / Markdown file get automatically included
