@@ -9,10 +9,19 @@ const render = (template, config, layer) => {
         throw new Error("More than 10 nested imports discovered. Either you have a very deep import tree (please don't), or there's a circular import, which is not supported.")
     }
 
+    const baseDir = config._baseDir || process.cwd();
+
     const escapedTemplate = template;
 
     const o = { ...config };
-    const premadePartials = config._partials || {};
+    const premadePartials = {...config._partials} || {};
+
+    for (key of Object.keys(premadePartials)) {
+        const possiblePath = premadePartials[key]
+        if (possiblePath.endsWith('.html')) {
+            premadePartials[key] = fs.readFileSync(path.resolve(baseDir, possiblePath), 'utf-8');
+        }
+    }
 
     // calculate imports from within the HTML file
     // imports take the form of 'import partial ./partial/file'
@@ -51,7 +60,6 @@ const render = (template, config, layer) => {
                 partialPath = partialPath.slice(0, partialPath.length - 1)
             }
 
-            const baseDir = config._baseDir || process.cwd();
             importedPartials[key] = fs.readFileSync(path.resolve(baseDir, partialPath), 'utf-8');
             continue;
         }
@@ -73,7 +81,10 @@ const render = (template, config, layer) => {
         const p = unparsedPartials[key]
 
         // only parse a partial if it's used in the file
-        if (template.indexOf('partials.' + key) > -1) {
+        if (template.indexOf('partials.' + key) > -1 ||
+            template.indexOf('macro("' + key) > -1 ||
+            template.indexOf("macro('" + key) > -1) {
+                console.log(unparsedPartials.card)
             partials[key] = render(p, o, layer + 1);
         }
     }
