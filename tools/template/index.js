@@ -19,7 +19,12 @@ const render = (template, config, layer) => {
     for (key of Object.keys(premadePartials)) {
         const possiblePath = premadePartials[key]
         if (possiblePath.endsWith('.html')) {
-            premadePartials[key] = fs.readFileSync(path.resolve(baseDir, possiblePath), 'utf-8');
+            const partialPath = path.resolve(baseDir, possiblePath)
+            if (!fs.existsSync(partialPath)) {
+                console.warn(`Partial at path ${partialPath} was not found. Your site may look incorrect.`)
+                continue;
+            }
+            premadePartials[key] = fs.readFileSync(partialPath, 'utf-8');
         }
     }
 
@@ -84,7 +89,6 @@ const render = (template, config, layer) => {
         if (template.indexOf('partials.' + key) > -1 ||
             template.indexOf('macro("' + key) > -1 ||
             template.indexOf("macro('" + key) > -1) {
-                console.log(unparsedPartials.card)
             partials[key] = render(p, o, layer + 1);
         }
     }

@@ -33,8 +33,16 @@ const buildFile = (touchedFile, baseContentDir, baseFrameDir, baseBuildDir, cach
     const defaultTargetDir = path.dirname(defaultTargetPath);
     
     // Determine whether we should change file paths from config
-    const targetDir = config.dir ? path.resolve(baseBuildDir, config.dir) : defaultTargetDir
-    
+    let targetDir = defaultTargetDir;
+    if (config.dir) {
+        targetDir = path.resolve(baseBuildDir, config.dir)
+        if (config.pageName === 'index' && 
+            path.resolve(baseContentDir) !== path.resolve(touchedFile.dir) &&
+            path.resolve(baseBuildDir) === path.resolve(targetDir)) {
+            // specialcase where if you try to make a directory top-level, we don't want the indexes to collide.
+            targetDir = path.resolve(baseBuildDir, config.dir, path.basename(touchedFile.dir))
+        }
+    }
     if (!fs.existsSync(targetDir)) {
         fs.mkdirSync(targetDir, { recursive: true })
     }
