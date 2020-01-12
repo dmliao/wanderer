@@ -1,14 +1,20 @@
 const toml = require('toml')
 
 const frontmatter = (text) => {
-    if (!text.startsWith('---')) {
+    let startToken = ''
+    if (text.startsWith('---')) {
+        startToken = '---'
+    } else if (text.startsWith('+++')) {
+        startToken = '+++'
+    }
+    if (!startToken) {
         return {
             config: {},
             text: text
         }
     }
 
-    const splits = text.split('---');
+    const splits = text.split(startToken);
     if (splits.length <= 2) {
         return {
             config: {},
@@ -23,7 +29,7 @@ const frontmatter = (text) => {
 
         const result = {
             config: frontmatter,
-            text: splits.join('---')
+            text: splits.join(startToken)
         }
 
         return result;
