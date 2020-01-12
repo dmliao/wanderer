@@ -39,6 +39,11 @@ class Cache {
                 continue;
             }
 
+            // skip files that are all whitespace...
+            if (!content.text || content.text.trim().length === 0) {
+                continue;
+            }
+
             content.config = {...file.config, ...content.config}
 
             // TODO: we need to have run tempo by now to get the proper dates for prefixed posts.
