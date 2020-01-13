@@ -9,6 +9,7 @@ touch(path.resolve(__dirname, '../../content'), {}, new Date(0)).then(result => 
     console.log(result)
 
     console.log(cache.db({ config: { dir: "secret" } }).stringify())
-    console.log(cache.db({ conig: { tags: "blog "}}).stringify())
+    console.log(cache.db({ config: {pageName: 'feed'}}).stringify())
+    console.log(cache.db({ tags: {like: "index"} }).stringify())
 })
 

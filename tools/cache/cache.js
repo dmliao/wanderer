@@ -67,6 +67,9 @@ class Cache {
             const pathEnd = content.config.rename || content.config.pageName
             content.url = [pathDir === '.' ? '' : pathDir, pathEnd === 'index' ? '' : pathEnd].join('/')
 
+            // add tags to top-level to allow querying
+            content.tags = content.config.tags
+
             if (!content.url.startsWith('/')) {
                 content.url = '/' + content.url
             }
