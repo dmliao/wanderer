@@ -48,6 +48,8 @@ const buildMarkdownFile = (touchedFile, targetDirPath, baseFrameDir, cache) => {
             if (typeof rawQuery === 'string') {
                 const relativeDir = path.join(pageObject.sourceDir, rawQuery)
                 query = { sourceDir: relativeDir }
+            } else {
+                query = rawQuery
             }
 
             feeds[feedName] = cache.getFeed({ 

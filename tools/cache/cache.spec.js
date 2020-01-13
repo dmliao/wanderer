@@ -6,6 +6,9 @@ const cache = new Cache(path.resolve(__dirname, 'test-cache'), path.resolve(__di
 
 touch(path.resolve(__dirname, '../../content'), {}, new Date(0)).then(result => {
     cache.update(result)
+    console.log(result)
 
-    console.log(cache.db({ config: { private: true } }).stringify())
+    console.log(cache.db({ config: { dir: "secret" } }).stringify())
+    console.log(cache.db({ conig: { tags: "blog "}}).stringify())
 })
+
