@@ -4,4 +4,4 @@ Variables should show up in Markdown.
 
 ---
 
-This page was last updated on ${o.date}.
+This page was last updated on ${date(o.date)}.

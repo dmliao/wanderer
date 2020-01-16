@@ -1,6 +1,9 @@
 const fs = require('fs');
 const path = require('path');
-const harpe = require('../harpe/harpe')
+
+const dayjs = require('dayjs');
+
+const harpe = require('../harpe/harpe');
 
 const render = (template, config, layer) => {
     layer = layer || 0;
@@ -111,6 +114,10 @@ const render = (template, config, layer) => {
     const md = (text) => {
         const parser = harpe();
         return parser.parse(text)
+    }
+
+    const date = (rawDate) => {
+        return dayjs(rawDate).format('MMM D, YYYY');
     }
 
     // dumbly loop through any nested template strings to get the final result.

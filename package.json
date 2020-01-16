@@ -10,6 +10,7 @@
   "author": "Amorphous",
   "license": "ISC",
   "dependencies": {
+    "dayjs": "^1.8.19",
     "minimist": "^1.2.0",
     "toml": "^3.0.0",
     "upath": "^1.2.0"
