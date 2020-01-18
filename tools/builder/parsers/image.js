@@ -6,7 +6,7 @@ const processImage = require('../../image-processor/index')
 
 const parseImageFile = (touchedFile, targetFilePath, cacheDir) => {
     if (cacheDir) {
-        const cacheFilename = touchedFile.id.replace('/', '_');
+        const cacheFilename = touchedFile.id.replace(/\//gm, '_');
         const cacheFilePath = path.resolve(cacheDir, cacheFilename);
     
         if (fs.existsSync(cacheFilePath)) {
