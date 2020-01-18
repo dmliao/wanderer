@@ -4,10 +4,17 @@ const stream = require('stream')
 const spawn = require('child_process').spawn
 const sharp = require('sharp')
 
-const processImage = (inputFilePath, targetFilePath, config) => {
+const processImage = (inputFilePath, targetFilePath, config, callback) => {
     config = config || {}
     const inputFile = path.basename(inputFilePath)
     const ext = path.extname(inputFile)
+    const targetFileDir = path.dirname(targetFilePath)
+
+    if (!fs.existsSync(targetFileDir)) {
+        fs.mkdirSync(targetFileDir, {recursive: true})
+    }
+
+    fs.writeFileSync(path.resolve(targetFilePath), '')
 
     const sharpTransformer = sharp()
         .resize({
@@ -45,43 +52,68 @@ const processImage = (inputFilePath, targetFilePath, config) => {
     }
     
     const outputStream = fs.createWriteStream(targetFilePath)
-    switch (ext.toLowerCase().slice(1)) {
-        case 'jpg':
-            exifProcessedStream
-                .pipe(sharpTransformer)
-                .pipe(outputStream)
-            break;
-        case 'png':
-            try {
-                if (config.noPNGCompress) {
-                    throw new Error('skipping pngquant step')
-                }
-                const pngQuant = spawn('pngquant', ['-v', '-f', '-s10', '-'])
 
-                exifProcessedStream
-                    .pipe(sharpTransformer)
-                    .pipe(pngQuant.stdin)
-                
-                pngQuant.stdout.pipe(outputStream)
-            } catch (e) {
-                console.log(e)
-                console.log('pngquant not found in path or was deliberately not used. You need to install pngquant yourself to compress PNGs')
-        
+    outputStream.on('open', () => {
+        switch (ext.toLowerCase().slice(1)) {
+            case 'jpg':
                 exifProcessedStream
                     .pipe(sharpTransformer)
                     .pipe(outputStream)
-            }
-
-            break;
-        default:
-            // pass through because we have no idea what's going on here
-            exifProcessedStream.pipe(outputStream)
-            break;
-    }
+                break;
+            case 'png':
+                try {
+                    if (config.noPNGCompress) {
+                        throw new Error('skipping pngquant step')
+                    }
+                    const pngQuant = spawn('pngquant', ['-v', '-f', '-s10', '-'])
+    
+                    exifProcessedStream
+                        .pipe(sharpTransformer)
+                        .pipe(pngQuant.stdin)
+                    
+                    pngQuant.stdout.pipe(outputStream)
+                } catch (e) {
+                    console.log(e)
+                    console.log('pngquant not found in path or was deliberately not used. You need to install pngquant yourself to compress PNGs')
+            
+                    exifProcessedStream
+                        .pipe(sharpTransformer)
+                        .pipe(outputStream)
+                }
+    
+                break;
+            default:
+                // pass through because we have no idea what's going on here
+                exifProcessedStream.pipe(outputStream)
+                break;
+        }
+    })
+    
 
     const imageTrackingString = 'write image ' + inputFile
     console.time(imageTrackingString)
-    outputStream.on('finish', () => console.timeEnd(imageTrackingString))
+    outputStream.on('finish', () => {
+        console.timeEnd(imageTrackingString)
+        if (callback) {
+            callback()
+        }
+    })
+
+    outputStream.on('error', (e) => {
+        console.log(e)
+    })
 }
 
-module.exports = processImage
+const processImagePromise = (inputFilePath, targetFilePath, config) => {
+    return new Promise((resolve, reject) => {
+        try {
+            processImage(inputFilePath, targetFilePath, config, () => {
+                resolve();
+            })
+        } catch (e) {
+            reject(e);
+        }
+    })
+}
+
+module.exports = processImagePromise

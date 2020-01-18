@@ -1,9 +1,8 @@
 const fs = require('fs')
-const path = require('path');
+const path = require('upath');
 
 const buildMarkdownFile = require('./parsers/md')
-
-const processImage = require('../image-processor/index')
+const buildImageFile = require('./parsers/image')
 
 const imageExtensions = ['png', 'jpg']
 const metaExtensions = ['toml']
@@ -49,7 +48,9 @@ const buildFile = (touchedFile, baseContentDir, baseFrameDir, baseBuildDir, cach
 
     // image
     if (imageExtensions.indexOf(ext.toLowerCase()) >= 0) {
-        processImage(filePath, path.resolve(targetDir, config.pageName + '.' + ext))
+        buildImageFile(touchedFile, 
+            path.resolve(targetDir, config.pageName + '.' + ext), 
+            cache ? cache.getDirectory() : '')
         return;
     }
 

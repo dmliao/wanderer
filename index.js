@@ -31,7 +31,25 @@ if (fs.existsSync(configFile)) {
 }
 
 if (argv.clean) {
-    fs.rmdirSync(cacheDir, { recursive: true })
+    // clean up cache stuff
+    try {
+        fs.unlinkSync(path.resolve(cacheDir, 'static', 'pages.json'))
+    } catch(e) {
+        // swallow it
+    }
+
+    try {
+        fs.unlinkSync(path.resolve(cacheDir, 'pages.json'))
+    } catch (e) {
+        // swallow it
+    }
+
+    try {
+        fs.unlinkSync(path.resolve(cacheDir, '.touchfile'))
+    } catch (e) {
+        // swallow it
+    }
+    
     fs.rmdirSync(buildDir, { recursive: true })
 }
 

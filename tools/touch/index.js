@@ -1,5 +1,5 @@
 const touch = require('./touch')
-const path = require('path')
+const path = require('upath')
 const fs = require('fs')
 
 const touchBin = async (dir, config, touchFile, shouldUpdateTouchFile) => {

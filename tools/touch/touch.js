@@ -19,6 +19,7 @@ const createTouchedFileObject = (baseDir, dir, file, stats, fileConfig) => {
         newConfig.date = stats.mtime
     }
 
+    newConfig.updated = stats.mtime
     newConfig.pageName = pageTempo.name
     return {
         id,

@@ -1,5 +1,5 @@
 const fs = require('fs');
-const path = require('path');
+const path = require('upath');
 
 const processFilename = require('../../tempo/process-tempo-filename')
 

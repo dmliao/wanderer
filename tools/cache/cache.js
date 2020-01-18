@@ -15,6 +15,10 @@ class Cache {
         }
     }
 
+    getDirectory() {
+        return this.cacheDir
+    }
+
     save() {
         if (!fs.existsSync(this.cacheDir)) {
             fs.mkdirSync(this.cacheDir, { recursive: true })
