@@ -10,6 +10,10 @@ const processedEntryExtensions = ['md', 'htm']
 
 // cache is optional. If a cache is not provided, we'll create a temporary one
 const buildFile = (touchedFile, baseContentDir, baseFrameDir, baseBuildDir, cache) => {
+    if (!touchedFile.isModified) {
+        return;
+    }
+    
     const filePath = path.resolve(touchedFile.dir, touchedFile.file)
 
     const ext = path.parse(touchedFile.file).ext.slice(1)

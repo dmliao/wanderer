@@ -5,7 +5,8 @@ const toml = require('toml');
 
 const processTempoFilename = require('../tempo/process-tempo-filename')
 
-const createTouchedFileObject = (baseDir, dir, file, stats, fileConfig) => {
+
+const createTouchedFileObject = (isTouched, baseDir, dir, file, stats, fileConfig) => {
     // do first pass of processing since touch is the only time we traverse the directory
     // and touch all the files
     const id = path.relative(baseDir, path.resolve(dir, file))
@@ -22,10 +23,11 @@ const createTouchedFileObject = (baseDir, dir, file, stats, fileConfig) => {
     newConfig.updated = stats.mtime
     newConfig.pageName = pageTempo.name
     return {
+        isModified: isTouched,
         id,
         file,
         dir: path.resolve(dir),
-        config: newConfig
+        config: newConfig,
     }
 }
 
@@ -52,10 +54,10 @@ const touchRecursive = async (baseDir, dir, globalConfig, dateToCheck) => {
             if (dayjs(dateToCheck).isBefore(dayjs(stats.mtime))) {
                 // this was touched!
 
-                return createTouchedFileObject(baseDir, dir, file, stats, fileConfig)
+                return createTouchedFileObject(true, baseDir, dir, file, stats, fileConfig)
             }
 
-            return undefined;
+            return createTouchedFileObject(false, baseDir, dir, file, stats, fileConfig);
         }
     }));
 

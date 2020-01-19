@@ -29,7 +29,12 @@ class Cache {
 
     update(touchedFiles) {
         const textFiles = ['md', 'htm']
+        let previousFile = undefined
         for (let file of touchedFiles) {
+            if (!file.isModified) {
+                continue;
+            }
+
             const ext = path.extname(file.file).toLowerCase().slice(1)
             if (textFiles.indexOf(ext) < 0) {
                 continue;
@@ -78,7 +83,30 @@ class Cache {
                 content.url = '/' + content.url
             }
 
+            // add previous and next pages.
+            const previousPage = previousFile && previousFile.dir === file.dir ? previousFile.id : undefined
+            if (previousPage) {
+                const previousPageObject = this.getPage(previousPage)
+                if (previousPageObject) {
+                    content.config.previous = {
+                        url: previousPageObject.url,
+                        id: previousPageObject.id,
+                        title: previousPageObject.title
+                    }
+
+                    previousPageObject.config.next = {
+                        url: content.url,
+                        id: content.id,
+                        title: content.title
+                    }
+
+                    // save the previous page object
+                    this.pageCache.merge(previousPageObject, "id")
+                }
+            }
+
             this.pageCache.merge(content, "id")
+            previousFile = file
         }
     }
 

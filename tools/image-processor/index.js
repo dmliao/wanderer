@@ -1,6 +1,5 @@
 const fs = require('fs')
 const path = require('upath')
-const stream = require('stream')
 const spawn = require('child_process').spawn
 
 const processImageGM = (inputFilePath, targetFilePath, config, callback) => {
@@ -12,7 +11,7 @@ const processImageGM = (inputFilePath, targetFilePath, config, callback) => {
         fs.mkdirSync(targetFileDir, {recursive: true})
     }
     try {
-        const gm = spawn('gm', ['convert', '-size', '1200x1200>', inputFilePath, '-resize', '1200x1200>', '-quality', 40, '-strip', targetFilePath])
+        const gm = spawn('gm', ['convert', '-size', '1200x1200>', inputFilePath, '-resize', '1200x1200>', '-quality', 75, '-strip', targetFilePath])
         gm.on('close', () => {
             if (ext !== '.png') {
                 if (callback) {
