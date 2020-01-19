@@ -55,7 +55,8 @@ const buildMarkdownFile = (touchedFile, targetDirPath, baseFrameDir, cache) => {
             feeds[feedName] = cache.getFeed({ 
                 query, 
                 sortBy: feed.sortBy,
-                isAscending: feed.isAscending 
+                isAscending: feed.isAscending,
+                limit: feed.limit
             })
         }
     }

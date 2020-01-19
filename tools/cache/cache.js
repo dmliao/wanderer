@@ -56,7 +56,7 @@ class Cache {
             content.config = {...file.config, ...content.config}
 
             // TODO: we need to have run tempo by now to get the proper dates for prefixed posts.
-            content.date = content.config.date
+            content.date = content.config.date.getTime()
             content.id = file.id
             content.sourceDir = path.dirname(file.id)
 
