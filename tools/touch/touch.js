@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('upath');
 const dayjs = require('dayjs');
-const toml = require('toml');
+const toml = require('@iarna/toml');
 
 const processTempoFilename = require('../tempo/process-tempo-filename')
 

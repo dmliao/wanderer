@@ -1,4 +1,4 @@
-const toml = require('toml');
+const toml = require('@iarna/toml');
 const path = require('upath');
 const fs = require('fs');
 
