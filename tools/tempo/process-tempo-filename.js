@@ -11,7 +11,7 @@ const processFilename = (filename) => {
         tempoString = possibleDateString;
         date = tempo.parse(tempoString)
         processedFilename = possibleDateTokens.join('-');
-    } else if (/^[0-9]+$/g.test(possibleDateString)) {
+    } else if (/^[0-9]+$/g.test(possibleDateString) && possibleDateTokens.length > 0) {
         processedFilename = possibleDateTokens.join('-');
     }
 

@@ -2,7 +2,7 @@ const TAFFY = require('taffydb').taffy;
 const fs = require('fs')
 const path = require('upath')
 const frontmatter = require('../frontmatter/index')
-
+const globals = require('../common/globals')
 class Cache {
     constructor(cacheDir) {
         this.cacheDir = path.resolve(cacheDir)
@@ -85,7 +85,10 @@ class Cache {
 
             // add previous and next pages.
             const previousPage = previousFile && previousFile.dir === file.dir ? previousFile.id : undefined
-            if (previousPage) {
+            
+            const shouldShowPrevNext = globals.specialFilenames.indexOf(file.file.split('.')[0]) <= -1
+
+            if (previousPage && shouldShowPrevNext) {
                 const previousPageObject = this.getPage(previousPage)
                 if (previousPageObject) {
                     content.config.previous = {
@@ -106,7 +109,9 @@ class Cache {
             }
 
             this.pageCache.merge(content, "id")
-            previousFile = file
+            if (shouldShowPrevNext) {
+                previousFile = file
+            }
         }
     }
 

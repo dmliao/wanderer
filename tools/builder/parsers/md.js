@@ -6,6 +6,8 @@ const template = require('../../template/index')
 const findStatics = require('../utils/find-statics')
 const createPrettyUrlPage = require('../utils/create-pretty-url-page')
 
+const globals = require('../../common/globals')
+
 const buildMarkdownFile = (touchedFile, targetDirPath, baseFrameDir, cache) => {
 
     const sourceFilePath = path.resolve(touchedFile.dir, touchedFile.file)
@@ -102,8 +104,7 @@ const buildMarkdownFile = (touchedFile, targetDirPath, baseFrameDir, cache) => {
     const targetPath = path.resolve(targetDirPath, processedFilename + '.html')
 
     // we really don't need to create a pretty URL page for an index
-    if (processedFilename !== 'index') {
-        
+    if (globals.specialFilenames.indexOf(processedFilename) <= -1) {
         createPrettyUrlPage(targetPath, templatedHTML);
     } else {
         // write the file
