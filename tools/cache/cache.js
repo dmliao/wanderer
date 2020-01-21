@@ -86,7 +86,13 @@ class Cache {
             // add previous and next pages.
             const previousPage = previousFile && previousFile.dir === file.dir ? previousFile.id : undefined
             
-            const shouldShowPrevNext = globals.specialFilenames.indexOf(file.file.split('.')[0]) <= -1
+            let shouldShowPrevNext = true
+            for (let name of globals.specialFilenames) {
+                if (file.file.startsWith(name)) {
+                    shouldShowPrevNext = false;
+                    break;
+                }
+            }
 
             if (previousPage && shouldShowPrevNext) {
                 const previousPageObject = this.getPage(previousPage)
