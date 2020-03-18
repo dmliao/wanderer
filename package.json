@@ -7,6 +7,9 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "postinstall": "cd tools/install && node npm-install-all.js"
   },
+  "bin": {
+    "wanderer": "./cli.js"
+  },
   "author": "Amorphous",
   "license": "ISC",
   "dependencies": {

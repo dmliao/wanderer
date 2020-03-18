@@ -1,61 +1,16 @@
-const toml = require('@iarna/toml');
-const path = require('upath');
-const fs = require('fs');
 
-var argv = require('minimist')(process.argv.slice(2));
 
 const touch = require('./tools/touch/index')
 const build = require('./tools/builder/index')
 
+const path = require('upath');
+const fs = require('fs');
+
 const Cache = require('./tools/cache/cache')
 
-console.time('build');
+const wanderer = async(config, frameDir, contentDir, cacheDir, buildDir) => {
 
-if (argv.h || argv.help) {
-    console.log('Usage: wanderer -f <frame directory> -i <content directory> -o <out directory> -c <config file>')
-    return;
-}
-
-const frameDir = argv.frame || argv.f || path.resolve(process.cwd(), 'frame')
-const contentDir = argv.in || argv.i || path.resolve(process.cwd(), 'content')
-const buildDir = argv.out || argv.o || path.resolve(process.cwd(), 'build')
-const cacheDir = argv.cache || argv.a || path.resolve(process.cwd(), '.cache')
-
-let metaConfig = {
-};
-
-const configFile = argv.config || argv.c || path.resolve(process.cwd(), 'config.toml')
-if (fs.existsSync(configFile)) {
-    const extraConfig = toml.parse(fs.readFileSync(path.resolve(process.cwd(), 'config.toml')));
-    metaConfig = {...metaConfig, ...extraConfig}
-}
-
-if (argv.clean) {
-    // clean up cache stuff
-    try {
-        fs.unlinkSync(path.resolve(cacheDir, 'static', 'pages.json'))
-    } catch(e) {
-        // swallow it
-    }
-
-    try {
-        fs.unlinkSync(path.resolve(cacheDir, 'pages.json'))
-    } catch (e) {
-        // swallow it
-    }
-
-    try {
-        fs.unlinkSync(path.resolve(cacheDir, '.touchfile'))
-    } catch (e) {
-        // swallow it
-    }
-    
-    fs.rmdirSync(buildDir, { recursive: true })
-}
-
-const buildSite = async() => {
-
-    const globalConfig = { ...metaConfig }
+    const globalConfig = { ...config }
 
     const touchFile = path.resolve(cacheDir, '.touchfile')
 
@@ -89,4 +44,4 @@ const buildSite = async() => {
     cache.save()
 }
 
-buildSite().then(() => console.timeEnd('build'))
+module.exports = wanderer;

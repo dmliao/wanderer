@@ -29,8 +29,13 @@ const processImageGM = (inputFilePath, targetFilePath, config, callback) => {
                         callback()
                     }
                 })
+                pngQuant.on('error', (e) => {
+                    console.log('pngquant not found in path or was deliberately not used. You need to install pngquant yourself to compress PNGs')
+                    if (callback) {
+                        callback()
+                    }
+                });
             } catch (e) {
-                console.log(e)
                 console.log('pngquant not found in path or was deliberately not used. You need to install pngquant yourself to compress PNGs')
                 if (callback) {
                     callback()
@@ -38,6 +43,10 @@ const processImageGM = (inputFilePath, targetFilePath, config, callback) => {
             }
             
         })
+
+        gm.on('error', (e) => {
+            throw e;
+        });
     } catch (e) {
         console.log('Graphicsmagick (as gm) needs to be installed and on the path for image processing to work')
         throw e;
