@@ -8,134 +8,153 @@ const createPrettyUrlPage = require('./utils/create-pretty-url-page')
 
 const globals = require('../common/globals')
 
-const plugin = (pluginFunction, touchedFile, targetDirPath, baseFrameDir, cache) => {
-    let pageObject = cache.getPage(touchedFile.id)
+const plugin = (
+	pluginFunction,
+	touchedFile,
+	targetDirPath,
+	baseFrameDir,
+	cache
+) => {
+	let pageObject = cache.getPage(touchedFile.id)
 
-    if (!pageObject) {
-        cache.update([touchedFile])
-        pageObject = cache.getPage(touchedFile.id)
-    }
+	if (!pageObject) {
+		cache.update([touchedFile])
+		pageObject = cache.getPage(touchedFile.id)
+	}
 
-    if (!pageObject) {
-        // we assume at this point that the page is deliberately being uncached, and thus should
-        // short-circuit here
-        return;
-    }
-    
-    const parsedConfig = pageObject.config;
+	if (!pageObject) {
+		// we assume at this point that the page is deliberately being uncached, and thus should
+		// short-circuit here
+		return
+	}
 
-    // handle file-level configuration
-    ///////////////////////////////////
+	const parsedConfig = pageObject.config
 
-    if (parsedConfig.private && parsedConfig.private === true) {
-        // skip this, since it's a private file
-        return;
-    }
+	// handle file-level configuration
+	///////////////////////////////////
 
-    processedFilename = parsedConfig.rename || parsedConfig.pageName;
+	if (parsedConfig.private && parsedConfig.private === true) {
+		// skip this, since it's a private file
+		return
+	}
 
-    /**
-     * genPageStatics - creates a file that contains static files associated with the page.
-     * static files are files that have the same name as a content file.
-     * @returns pageStatics {
-     *  css: path to css file
-     *  js: path to js file
-     *  statics: [list of other static files]
-     * }
-     */
-    const genPageStatics = () => {
-        const sourceFilePath = path.resolve(touchedFile.dir, touchedFile.file)
-    
-        // figure out if we should add css / js files
-        const pageStatics = findStatics(sourceFilePath)
-        return pageStatics;
-    }
+	processedFilename = parsedConfig.rename || parsedConfig.pageName
 
-    /**
-     * genFeeds - creates feeds that can be used in layouts in content pages
-     */
-    const genFeeds = () => {
-        // generate all of the feeds
-        //////////////////////////////
-        const feeds = {}
-        if (parsedConfig.feeds) {
-            for (let feedName of Object.keys(parsedConfig.feeds)) {
-                const feed = parsedConfig.feeds[feedName]
-                // if the feed query is a string, we need to generate a query from it
-                const rawQuery = feed.query
-                let query
+	/**
+	 * genPageStatics - creates a file that contains static files associated with the page.
+	 * static files are files that have the same name as a content file.
+	 * @returns pageStatics {
+	 *  css: path to css file
+	 *  js: path to js file
+	 *  statics: [list of other static files]
+	 * }
+	 */
+	const genPageStatics = () => {
+		const sourceFilePath = path.resolve(touchedFile.dir, touchedFile.file)
 
-                if (typeof rawQuery === 'string') {
-                    const relativeDir = path.join(pageObject.sourceDir, rawQuery)
-                    query = { sourceDir: relativeDir }
-                } else {
-                    query = rawQuery
-                }
+		// figure out if we should add css / js files
+		const pageStatics = findStatics(sourceFilePath)
+		return pageStatics
+	}
 
-                feeds[feedName] = cache.getFeed({ 
-                    query, 
-                    sortBy: feed.sortBy,
-                    isAscending: feed.isAscending,
-                    limit: feed.limit
-                })
-            }
-        }
+	/**
+	 * genFeeds - creates feeds that can be used in layouts in content pages
+	 */
+	const genFeeds = () => {
+		// generate all of the feeds
+		//////////////////////////////
+		const feeds = {}
+		if (parsedConfig.feeds) {
+			for (let feedName of Object.keys(parsedConfig.feeds)) {
+				const feed = parsedConfig.feeds[feedName]
+				// if the feed query is a string, we need to generate a query from it
+				const rawQuery = feed.query
+				let query
 
-        return feeds;
-    }
+				if (typeof rawQuery === 'string') {
+					const relativeDir = path.join(
+						pageObject.sourceDir,
+						rawQuery
+					)
+					query = { sourceDir: relativeDir }
+				} else {
+					query = rawQuery
+				}
 
-    /**
-     * genLayout - produces layout text based on input configuration
-     * @returns layoutText - string with the layout that can be processed with template.
-     */
-    const genLayout = () => {
-        // find the layout
-        const layout = parsedConfig.layout || 'default';
+				feeds[feedName] = cache.getFeed({
+					query,
+					sortBy: feed.sortBy,
+					isAscending: feed.isAscending,
+					limit: feed.limit
+				})
+			}
+		}
 
-        const layoutPath = path.resolve(baseFrameDir, 'layouts', layout + '.html');
-        let layoutText = '${o.content}'
-        if (fs.existsSync(layoutPath)) {
-            layoutText = fs.readFileSync(path.resolve(baseFrameDir, 'layouts', layout + '.html')).toString();
-        }
+		return feeds
+	}
 
-        return layoutText;
-    }
+	/**
+	 * genLayout - produces layout text based on input configuration
+	 * @returns layoutText - string with the layout that can be processed with template.
+	 */
+	const genLayout = () => {
+		// find the layout
+		const layout = parsedConfig.layout || 'default'
 
-    /**
-     * genBuild - creates the output file in the correct location for pretty URLs.
-     * @param {string} content - string with the file's contents
-     * @param {string} extension - file extension to use (without the leading .)
-     */
-    const genBuild = (content, extension) => {
-        const targetPath = path.resolve(targetDirPath, processedFilename + extension)
-        // we really don't need to create a pretty URL page for an index
-        if (globals.specialFilenames.indexOf(processedFilename) <= -1) {
-            createPrettyUrlPage(targetPath, content);
-        } else {
-            // write the file
-            fs.writeFileSync(targetPath, content);
-        }
+		const layoutPath = path.resolve(
+			baseFrameDir,
+			'layouts',
+			layout + '.html'
+		)
+		let layoutText = '${o.content}'
+		if (fs.existsSync(layoutPath)) {
+			layoutText = fs
+				.readFileSync(
+					path.resolve(baseFrameDir, 'layouts', layout + '.html')
+				)
+				.toString()
+		}
 
-    }
+		return layoutText
+	}
 
-    // call the pluginFunction
-    pluginFunction({
-        // base inputs
-        touchedFile,
-        baseFrameDir,
-        targetDirPath,
-        pageObject,
+	/**
+	 * genBuild - creates the output file in the correct location for pretty URLs.
+	 * @param {string} content - string with the file's contents
+	 * @param {string} extension - file extension to use (without the leading .)
+	 */
+	const genBuild = (content, extension) => {
+		const targetPath = path.resolve(
+			targetDirPath,
+			processedFilename + extension
+		)
+		// we really don't need to create a pretty URL page for an index
+		if (globals.specialFilenames.indexOf(processedFilename) <= -1) {
+			createPrettyUrlPage(targetPath, content)
+		} else {
+			// write the file
+			fs.writeFileSync(targetPath, content)
+		}
+	}
 
-        // generator functions
-        genPageStatics,
-        genBuild,
-        genFeeds,
-        genLayout,
+	// call the pluginFunction
+	pluginFunction({
+		// base inputs
+		touchedFile,
+		baseFrameDir,
+		targetDirPath,
+		pageObject,
 
-        // helper libraries
-        harpe,
-        template
-    });
+		// generator functions
+		genPageStatics,
+		genBuild,
+		genFeeds,
+		genLayout,
+
+		// helper libraries
+		harpe,
+		template
+	})
 }
 
-module.exports = plugin;
+module.exports = plugin
