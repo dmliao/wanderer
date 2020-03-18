@@ -1,15 +1,24 @@
 # wanderer
 
-A static site generator written with NodeJS.
+an opinionated static site generator written in Node.JS.
 
-## Goals
+[Source Code](https://github.com/dmliao/wanderer)
 
-* content written in .md or .html, using custom parsers so I can modify the authoring scheme whenever I want
-* separated concerns for content and layout, with a content folder that can live wherever (...like a synced folder, for example)
-* few dependencies. I don't go for zero dependencies, but I'd rather that the dependencies I bring in have zero dependencies of their own. Keep the node_modules folder from exploding.
-    * This does eliminate a lot of JS build tools, so no webpack or parcel for any of the frontend files. I might add some CSS preprocessing but that will also be tricky.
+Is it ready for production use? It's ready in the sense that I personally use it. But it's very much a tool that's made by me, _for_ me, and thus might not be suited to your needs.
 
-## Usage
+## features
+
+* HTML templating, layouts, and partials using JS template strings.
+* Write pages in a Markdown subset, or with HTML.
+* flat file content structure. Builds the site in the exact structure as the source content, unless you change it.
+* image processing via `Graphicsmagick` to make web-ready images
+* as few dependencies as possible - most tools are created as subdirectories, and only uses npm packages that have zero dependencies of their own for text content. (Processing images and media requires more packages)
+
+## notes
+
+* For image compression to work properly, your computer needs both `gm` (Graphicsmagick) and `pngquant` installed and on the path.
+
+## usage
 
 I made the interesting choice of having multiple nested package.json files. Running npm install in the base directory should install all of them automatically, but if for some reason that fails, you'll have to go and install dependencies in each tool manually:
 
@@ -31,22 +40,3 @@ node index -i <content folderpath> -f <frame folderpath> -o <build folderpath> -
 ```
 
 > If no inputs are provided, wanderer will build in the current directory, assuming that the content lives in `./content`, the frame is in `./frame`, and the build should output to `./build`
-
-## Other Dependencies
-
-Image processing was tricky to handle, so currently requires two external tools beyond what we get from npm install:
-
-### exiftool
-
-Used to strip metadata from photos before putting them online. This can be downloaded from https://exiftool.org/, and needs to be on the path as `exiftool` for the relevant functionality to work.
-
-### pngquant
-
-Used to further compress PNGs beyond what `sharp` can do. This can be downloaded from https://pngquant.org/, and needs to be on the path as `pngquant`.
-
-## TODO
-
-* Figure out a method for handling lists and feeds. We don't want to have to add them to the build for every file, so we'll need some method to add to a specific page that those features are being used. (Probably in page level config.)
-    * Lists will also make `touch` a bit more complicated, as any file that pulls content from a different directory will need to be accounted for by touch.
-* Actually use it to build a website - this is mostly in 'thought experiment' level of implementation, and so probably has edge cases I haven't considered
-* Figure out how redirects should work. HTML can create redirects through https://www.w3docs.com/snippets/html/how-to-redirect-a-web-page-in-html.html
