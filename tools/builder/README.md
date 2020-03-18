@@ -20,8 +20,8 @@ Contains resources used by the frame. Static assets are pulled into the `/static
 
 * currently supports pages as `.md` files, which are compiled via `harpe`.
 * also supports `.html` pages, which are copied over as is without any compilation whatsoever. This allows you to make a complete site in the content folder if you want to, and have it ported over exactly in build.
-* (TODO) it will eventually support `.htm` pages, which are html content pages that go through the template engine, but are already written as html and so don't need Markdown processing.
-* Uses the exact same folder structure in the finished site as was used in the source files. Folders are URL parts, and the builder supports pretty urls
+* All parsers to directly work with content are found in the `plugin` tool, since they're extensible plugins.
+* TODO - you can also define external plugins. More on how this works to be determined...
 
 ### Titles
 

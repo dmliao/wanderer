@@ -1,8 +1,8 @@
 {
-  "name": "builder",
+  "name": "plugin",
   "version": "1.0.0",
-  "description": "Build tool for the wanderer static site generator.",
-  "main": "index.js",
+  "description": "",
+  "main": "asset.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },

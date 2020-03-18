@@ -1,7 +1,13 @@
 class Plugin {
+
+    types = {
+        ASSET: 'ASSET',
+        CONTENT: 'CONTENT',
+    };
+    
     getType() {
         // either ASSET or CONTENT
-        return 'CONTENT';
+        return this.types.CONTENT;
     }
 
     getExtensions() {
@@ -10,7 +16,9 @@ class Plugin {
 
     parse(opts) {
         // override this
-        
+
         return;
     }
 }
+
+module.exports = Plugin;

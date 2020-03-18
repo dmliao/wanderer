@@ -3,8 +3,8 @@ const path = require('upath')
 const harpe = require('../harpe/harpe')
 const template = require('../template/index')
 
-const findStatics = require('../builder/utils/find-statics')
-const createPrettyUrlPage = require('../builder/utils/create-pretty-url-page')
+const findStatics = require('./utils/find-statics')
+const createPrettyUrlPage = require('./utils/create-pretty-url-page')
 
 const globals = require('../common/globals')
 
@@ -34,6 +34,15 @@ const plugin = (pluginFunction, touchedFile, targetDirPath, baseFrameDir, cache)
 
     processedFilename = parsedConfig.rename || parsedConfig.pageName;
 
+    /**
+     * genPageStatics - creates a file that contains static files associated with the page.
+     * static files are files that have the same name as a content file.
+     * @returns pageStatics {
+     *  css: path to css file
+     *  js: path to js file
+     *  statics: [list of other static files]
+     * }
+     */
     const genPageStatics = () => {
         const sourceFilePath = path.resolve(touchedFile.dir, touchedFile.file)
     
@@ -42,6 +51,9 @@ const plugin = (pluginFunction, touchedFile, targetDirPath, baseFrameDir, cache)
         return pageStatics;
     }
 
+    /**
+     * genFeeds - creates feeds that can be used in layouts in content pages
+     */
     const genFeeds = () => {
         // generate all of the feeds
         //////////////////////////////
@@ -72,6 +84,10 @@ const plugin = (pluginFunction, touchedFile, targetDirPath, baseFrameDir, cache)
         return feeds;
     }
 
+    /**
+     * genLayout - produces layout text based on input configuration
+     * @returns layoutText - string with the layout that can be processed with template.
+     */
     const genLayout = () => {
         // find the layout
         const layout = parsedConfig.layout || 'default';
@@ -85,6 +101,11 @@ const plugin = (pluginFunction, touchedFile, targetDirPath, baseFrameDir, cache)
         return layoutText;
     }
 
+    /**
+     * genBuild - creates the output file in the correct location for pretty URLs.
+     * @param {string} content - string with the file's contents
+     * @param {string} extension - file extension to use (without the leading .)
+     */
     const genBuild = (content, extension) => {
         const targetPath = path.resolve(targetDirPath, processedFilename + extension)
         // we really don't need to create a pretty URL page for an index
