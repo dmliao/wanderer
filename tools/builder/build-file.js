@@ -1,8 +1,11 @@
 const fs = require('fs')
 const path = require('upath');
 
-const buildMarkdownFile = require('./parsers/md')
-const buildImageFile = require('./parsers/image')
+const buildMarkdownFile = require('./parsers/md-plugin')
+const buildImageFile = require('./parsers/image-plugin')
+
+const assetPlugin = require('../plugin/asset');
+const contentPlugin = require('../plugin/content');
 
 const imageExtensions = ['png', 'jpg']
 const metaExtensions = ['toml']
@@ -52,9 +55,11 @@ const buildFile = (touchedFile, baseContentDir, baseFrameDir, baseBuildDir, cach
 
     // image
     if (imageExtensions.indexOf(ext.toLowerCase()) >= 0) {
-        buildImageFile(touchedFile, 
-            path.resolve(targetDir, config.pageName + '.' + ext), 
-            cache ? cache.getDirectory() : '')
+        assetPlugin(buildImageFile, 
+            touchedFile, 
+            targetDir, 
+            baseFrameDir, 
+            cache);
         return;
     }
 
@@ -66,11 +71,9 @@ const buildFile = (touchedFile, baseContentDir, baseFrameDir, baseBuildDir, cach
 
     // markdown
     if (ext === 'md') {
-        buildMarkdownFile(touchedFile, targetDir, baseFrameDir, cache);
+        contentPlugin(buildMarkdownFile, touchedFile, targetDir, baseFrameDir, cache);
         return
     }
-
-    // htm
 
     // html
     if (ext === 'html') {

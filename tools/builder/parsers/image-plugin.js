@@ -4,10 +4,22 @@ const dayjs = require('dayjs');
 
 const processImage = require('../../image-processor/index')
 
-const parseImageFile = (touchedFile, targetFilePath, cacheDir) => {
-    if (cacheDir) {
+const parseImageFile = (opts) => {
+    const {
+        // base inputs
+        touchedFile,
+        baseFrameDir,
+        targetDirPath,
+        cacheDirectory
+    } = opts;
+
+    const config = touchedFile.config;
+    const ext = path.parse(touchedFile.file).ext.slice(1);
+    const targetFilePath = path.resolve(targetDirPath, config.pageName + '.' + ext)
+
+    if (cacheDirectory) {
         const cacheFilename = touchedFile.id.replace(/\//gm, '_');
-        const cacheFilePath = path.resolve(cacheDir, cacheFilename);
+        const cacheFilePath = path.resolve(cacheDirectory, cacheFilename);
     
         if (fs.existsSync(cacheFilePath)) {
             const cacheUpdatedTime = fs.statSync(cacheFilePath).mtime

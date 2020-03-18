@@ -28,6 +28,7 @@ class Cache {
     }
 
     update(touchedFiles) {
+        // TODO: anything that involves plugins should also be sent here.
         const textFiles = ['md', 'htm']
         let previousFile = undefined
         for (let file of touchedFiles) {
