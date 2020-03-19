@@ -4,7 +4,51 @@ const build = require('./tools/builder/index')
 const path = require('upath')
 const fs = require('fs')
 
+const ImageParser = require('./tools/plugin/parsers/image')
+const MDParser = require('./tools/plugin/parsers/md')
+
 const Cache = require('./tools/cache/cache')
+
+const buildWandererDirectory = async (
+	config,
+	pluginList,
+	contentDir,
+	cacheDir,
+	frameDir,
+	buildDir,
+	touchFile,
+	shouldUpdateTouchFile
+) => {
+	const cache = new Cache(cacheDir)
+	cache.setContentExtensions(pluginList)
+
+	// build the content files
+	const touchedFiles = await touch(
+		contentDir,
+		config,
+		touchFile,
+		shouldUpdateTouchFile
+	)
+
+	cache.update(touchedFiles)
+
+	// once the cache is created all the files should be able to build independently
+	// so let's do it asynchronously
+	await Promise.all(
+		touchedFiles.map(async (file) => {
+			return build(
+				pluginList,
+				file,
+				contentDir,
+				frameDir,
+				buildDir,
+				cache
+			)
+		})
+	)
+
+	cache.save()
+}
 
 const wanderer = async (config, frameDir, contentDir, cacheDir, buildDir) => {
 	const globalConfig = { ...config }
@@ -14,41 +58,32 @@ const wanderer = async (config, frameDir, contentDir, cacheDir, buildDir) => {
 	// build all of the static files in the frame
 	const staticDir = path.resolve(frameDir, 'static')
 
+	// get the plugins and create the cache
+	const pluginList = [new ImageParser(), new MDParser()]
+
 	if (fs.existsSync(staticDir)) {
-		const staticFiles = await touch(staticDir, globalConfig, touchFile)
-		const staticCache = new Cache(path.resolve(cacheDir, 'static'))
-		staticCache.update(staticFiles)
-
-		await Promise.all(
-			staticFiles.map(async (file) => {
-				return build(
-					file,
-					staticDir,
-					frameDir,
-					path.resolve(buildDir, 'static'),
-					staticCache
-				)
-			})
+		await buildWandererDirectory(
+			globalConfig,
+			pluginList,
+			staticDir,
+			path.resolve(cacheDir, 'static'),
+			frameDir,
+			path.resolve(buildDir, 'static'),
+			touchFile,
+			false
 		)
-
-		staticCache.save()
 	}
 
-	// build the content files
-	const touchedFiles = await touch(contentDir, globalConfig, touchFile, true)
-
-	const cache = new Cache(cacheDir, contentDir)
-	cache.update(touchedFiles)
-
-	// once the cache is created all the files should be able to build independently
-	// so let's do it asynchronously
-	await Promise.all(
-		touchedFiles.map(async (file) => {
-			return build(file, contentDir, frameDir, buildDir, cache)
-		})
+	await buildWandererDirectory(
+		globalConfig,
+		pluginList,
+		contentDir,
+		cacheDir,
+		frameDir,
+		buildDir,
+		touchFile,
+		true
 	)
-
-	cache.save()
 }
 
 module.exports = wanderer

@@ -6,6 +6,7 @@ const metaExtensions = ['toml']
 
 // cache is optional. If a cache is not provided, we'll create a temporary one
 const buildFile = (
+	pluginList,
 	touchedFile,
 	baseContentDir,
 	baseFrameDir,
@@ -57,7 +58,7 @@ const buildFile = (
 	}
 
 	// now with all the preprocessing done, let's build the final file.
-	parseFile([], touchedFile, targetDir, baseFrameDir, cache)
+	parseFile(pluginList, touchedFile, targetDir, baseFrameDir, cache)
 }
 
 module.exports = buildFile
