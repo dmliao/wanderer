@@ -15,7 +15,7 @@
 	"dependencies": {
 		"@iarna/toml": "^2.2.3",
 		"dayjs": "^1.8.19",
-		"minimist": "^1.2.0",
+		"minimist": "^1.2.2",
 		"upath": "^1.2.0"
 	}
 }
