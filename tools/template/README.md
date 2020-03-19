@@ -70,5 +70,3 @@ ${partials.partialName}
 At the top of the template HTML file. Note that there are no quotes, and partial URLs with spaces in them will probably not work correctly.
 
 The `partialName` will be added to the `partials` object at time of compilation, and so can be used in that particular template file.
-
-## Macros

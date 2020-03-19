@@ -27,7 +27,7 @@ const configFile =
 	argv.config || argv.c || path.resolve(process.cwd(), 'config.toml')
 if (fs.existsSync(configFile)) {
 	const extraConfig = toml.parse(
-		fs.readFileSync(path.resolve(process.cwd(), 'config.toml'))
+		fs.readFileSync(configFile)
 	)
 	metaConfig = { ...metaConfig, ...extraConfig }
 }

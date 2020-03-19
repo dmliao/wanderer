@@ -1,0 +1,7 @@
+
+[feeds]
+
+[feeds.pages]
+query = { tags = { like = "pages" } }
+isAscending = true
+sortBy = "id"

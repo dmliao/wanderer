@@ -1,0 +1,22 @@
+body {
+    font-family: sans-serif;
+}
+
+#main {
+    margin: 0 auto;
+    max-width: 800px;
+}
+
+#main img {
+    max-width: 100%;
+}
+
+
+footer {
+    display: flex;
+    justify-content: space-between;
+}
+
+footer #next {
+    text-align: right;
+}
