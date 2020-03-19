@@ -1,21 +1,21 @@
 {
-  "name": "wanderer",
-  "version": "0.1.0",
-  "description": "Static site generator",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "postinstall": "cd tools/install && node npm-install-all.js"
-  },
-  "bin": {
-    "wanderer": "./cli.js"
-  },
-  "author": "Amorphous",
-  "license": "ISC",
-  "dependencies": {
-    "@iarna/toml": "^2.2.3",
-    "dayjs": "^1.8.19",
-    "minimist": "^1.2.0",
-    "upath": "^1.2.0"
-  }
+	"name": "wanderer",
+	"version": "0.2.0",
+	"description": "Static site generator",
+	"main": "index.js",
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1",
+		"postinstall": "cd tools/install && node npm-install-all.js"
+	},
+	"bin": {
+		"wanderer": "./cli.js"
+	},
+	"author": "Amorphous",
+	"license": "ISC",
+	"dependencies": {
+		"@iarna/toml": "^2.2.3",
+		"dayjs": "^1.8.19",
+		"minimist": "^1.2.0",
+		"upath": "^1.2.0"
+	}
 }

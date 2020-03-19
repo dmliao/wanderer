@@ -4,9 +4,7 @@ const build = require('./tools/builder/index')
 const path = require('upath')
 const fs = require('fs')
 
-const ImageParser = require('./tools/plugin/parsers/image')
-const MDParser = require('./tools/plugin/parsers/md')
-
+const loadPluginsFromConfig = require('./tools/plugin/load-from-config')
 const Cache = require('./tools/cache/cache')
 
 const buildWandererDirectory = async (
@@ -59,7 +57,7 @@ const wanderer = async (config, frameDir, contentDir, cacheDir, buildDir) => {
 	const staticDir = path.resolve(frameDir, 'static')
 
 	// get the plugins and create the cache
-	const pluginList = [new ImageParser(), new MDParser()]
+	const pluginList = loadPluginsFromConfig(globalConfig)
 
 	if (fs.existsSync(staticDir)) {
 		await buildWandererDirectory(
