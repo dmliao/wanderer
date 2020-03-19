@@ -1,3 +1,5 @@
+#! /usr/bin/env node
+
 const toml = require('@iarna/toml');
 const path = require('upath');
 const fs = require('fs');
