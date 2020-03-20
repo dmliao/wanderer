@@ -1,9 +1,11 @@
 class Plugin {
 
-    types = {
-        ASSET: 'ASSET',
-        CONTENT: 'CONTENT',
-    };
+    constructor() {
+        this.types = {
+            ASSET: 'ASSET',
+            CONTENT: 'CONTENT',
+        };
+    }
     
     getType() {
         // either ASSET or CONTENT
