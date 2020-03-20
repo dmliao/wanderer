@@ -52,7 +52,9 @@ if (argv.clean) {
 		// swallow it
 	}
 
-	fs.rmdirSync(buildDir, { recursive: true })
+	if (fs.existsSync(buildDir)) {
+		fs.rmdirSync(buildDir, { recursive: true })
+	}
 }
 
 wanderer(metaConfig, frameDir, contentDir, cacheDir, buildDir).then(() =>
