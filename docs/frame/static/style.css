@@ -1,22 +1,133 @@
+:root {
+	--pre-color: var(--grey-5);
+	--link-color: var(--color-primary-1);
+	--active-color: var(--color-primary-0);
+}
+
+/* apply a natural box layout model to all elements, but allowing components to change */
+html {
+	box-sizing: border-box;
+}
+*,
+*:before,
+*:after {
+	box-sizing: inherit;
+}
+
 body {
-    font-family: sans-serif;
+	font-family: sans-serif;
+	line-height: 1.4em;
 }
 
-#main {
-    margin: 0 auto;
-    max-width: 800px;
+.container {
+	display: grid;
+
+	grid-template-areas:
+		'left header header header'
+		'left nav content side'
+		'left nav footer side';
+
+	grid-template-columns: 1fr auto auto 1fr;
+	grid-template-rows: auto 1fr auto;
+	grid-gap: 24px;
+
+	height: 100vh;
 }
 
-#main img {
-    max-width: 100%;
+a {
+	text-decoration: none;
+	font-weight: bold;
+	color: var(--link-color);
 }
 
+main {
+	margin: 0 auto;
+	width: 100%;
+}
+
+main img {
+	max-width: 100%;
+}
+
+article {
+	width: 100%;
+	max-width: 720px;
+	padding: 64px;
+	box-shadow: 0 0 4px var(--grey-4);
+}
+
+nav {
+	grid-area: nav;
+	margin-left: 0.5rem;
+}
+
+nav > div {
+	position: sticky;
+	top: 0;
+	box-shadow: 0 0 4px var(--grey-4);
+	padding: 16px 0;
+}
+
+nav ul {
+	list-style-type: none;
+	padding: 0;
+}
+
+nav ul a {
+	color: var(--grey-3);
+	padding: 12px 24px;
+	display: inline-block;
+	width: 100%;
+	box-sizing: border-box;
+}
+
+nav ul a:hover {
+	background-color: var(--grey-6);
+}
+
+main {
+	grid-area: content;
+}
+
+aside {
+	grid-area: side;
+	margin-right: 0.5rem;
+}
 
 footer {
-    display: flex;
-    justify-content: space-between;
+	grid-area: footer;
+}
+
+footer {
+	display: flex;
+	justify-content: space-between;
 }
 
 footer #next {
-    text-align: right;
+	text-align: right;
+}
+
+pre,
+code {
+	font-size: 16px;
+}
+
+pre {
+	padding: 12px;
+	max-width: 100%;
+	overflow: auto;
+	background-color: var(--pre-color);
+}
+
+code {
+	background-color: var(--pre-color);
+	border-radius: 2px;
+	padding: 2px;
+}
+
+pre code {
+	/* negate all of the code styles in multi-line code blocks */
+	background: none;
+	border-radius: 0;
+	padding: 0;
 }

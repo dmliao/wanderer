@@ -5,17 +5,25 @@ import scripts from './partials/scripts.html'
 <html>
   ${partials.head}
   <body>
-    <nav id="sidebar">
-      ${md(o.feeds.pages.map( post => {
-        return `* [${post.title}](${post.url})`
-      }).join('\n'))}
-    </nav>
-    <section id="main">
-
-      ${o.content}
-    
-
-
+    <div class="container">
+      <nav id="sidebar">
+        <div>
+          <ul>
+            <li>
+              <a href="/" class="primary">wanderer</a>
+            </li>
+          </ul>
+          
+          ${md(o.feeds.pages.map( post => {
+            return `* [${post.title}](${post.url})`
+          }).join('\n'))}
+        </div>
+      </nav>
+      <main>
+        <article>
+        ${o.content}
+        </article>
+      </main>
       <footer>
         <div id="prev">
           ${o.previous ?
@@ -28,7 +36,6 @@ import scripts from './partials/scripts.html'
               <p>${o.next.title}</p>
             </div>` : ''}
       </footer>
-    </section>
-    
+    </div>
   </body>
 </html>
