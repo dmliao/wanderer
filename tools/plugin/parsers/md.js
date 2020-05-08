@@ -12,7 +12,6 @@ class MDParser extends Plugin {
             
         const {
             // base inputs
-            touchedFile,
             baseFrameDir,
             targetDirPath,
             pageObject,
@@ -45,8 +44,9 @@ class MDParser extends Plugin {
             // adds page-specific css and js
             ...pageStatics,
 
-            // adds anything from the frontmatter + folder config
+            // adds anything from the frontmatter + folder config at top-level
             ...parsedConfig,
+            ...pageObject,
             feeds,
             content: html,
             _baseDir: baseFrameDir

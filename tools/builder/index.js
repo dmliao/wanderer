@@ -58,7 +58,7 @@ const buildFile = (
 	}
 
 	// now with all the preprocessing done, let's build the final file.
-	parseFile(pluginList, touchedFile, targetDir, baseFrameDir, cache)
+	parseFile(pluginList, touchedFile, targetDir, baseContentDir, baseFrameDir, cache)
 }
 
 module.exports = buildFile

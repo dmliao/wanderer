@@ -7,18 +7,18 @@ const ImageParser = require('./parsers/image');
 const MDParser = require('./parsers/md');
 const CopyParser = require('./parsers/copy');
 
-const runPlugin = (pluginInstance, touchedFile, targetDirPath, baseFrameDir, cache) => {
+const runPlugin = async (pluginInstance, touchedFile, targetDirPath, baseContentDir, baseFrameDir, cache) => {
     const type = pluginInstance.getType();
     if (type === 'CONTENT') {
-        return contentPlugin(pluginInstance.parse, touchedFile, targetDirPath, baseFrameDir, cache);
+        return await contentPlugin(pluginInstance.parse, touchedFile, targetDirPath, baseContentDir, baseFrameDir, cache);
     }
 
-    return assetPlugin(pluginInstance.parse, touchedFile, targetDirPath, baseFrameDir, cache);
+    return await assetPlugin(pluginInstance.parse, touchedFile, targetDirPath, baseContentDir, baseFrameDir, cache);
 }
 
 const copyPlugin = new CopyParser();
 
-const parseFile = (pluginList, touchedFile, targetDirPath, baseFrameDir, cache) => {
+const parseFile = async (pluginList, touchedFile, targetDirPath, baseContentDir, baseFrameDir, cache) => {
     if (!pluginList || !pluginList.length) {
         pluginList = [
             new ImageParser(),
@@ -31,7 +31,7 @@ const parseFile = (pluginList, touchedFile, targetDirPath, baseFrameDir, cache) 
     for (let plugin of pluginList) {
         const validExtensions = plugin.getExtensions();
         if (validExtensions.indexOf(ext.toLowerCase()) >= 0) {
-            runPlugin(plugin, touchedFile, targetDirPath, baseFrameDir, cache);
+            await runPlugin(plugin, touchedFile, targetDirPath, baseContentDir, baseFrameDir, cache);
             handled = true;
             break;
         }
@@ -39,7 +39,7 @@ const parseFile = (pluginList, touchedFile, targetDirPath, baseFrameDir, cache) 
 
     if (!handled) {
         // copy file over statically
-        runPlugin(copyPlugin, touchedFile, targetDirPath, baseFrameDir, cache);
+        await runPlugin(copyPlugin, touchedFile, targetDirPath, baseContentDir, baseFrameDir, cache);
     }
 }
 

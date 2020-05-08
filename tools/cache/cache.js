@@ -1,8 +1,8 @@
 const TAFFY = require('taffydb').taffy
 const fs = require('fs')
 const path = require('upath')
-const frontmatter = require('../frontmatter/index')
 const globals = require('../common/globals')
+const configure = require('../configuration')
 class Cache {
 	constructor(cacheDir) {
 		this.cacheDir = path.resolve(cacheDir)
@@ -40,8 +40,7 @@ class Cache {
 		fs.writeFileSync(this.pageCachePath, this.pageCache().stringify())
 	}
 
-	update(touchedFiles) {
-		let previousFile = undefined
+	async update(baseDir, touchedFiles) {
 		for (let file of touchedFiles) {
 			if (!file.isModified) {
 				continue
@@ -57,59 +56,18 @@ class Cache {
 
 			const filePath = path.resolve(file.dir, file.file)
 
-			const content = frontmatter(fs.readFileSync(filePath, 'utf-8'))
-
-			if (content.config.private && content.config.private === true) {
+			const pageInfo = await configure.getPageInfo(baseDir, filePath)
+			if (pageInfo.config.private && pageInfo.config.private === true) {
 				continue
 			}
 
 			// skip files that are all whitespace...
-			if (!content.text || content.text.trim().length === 0) {
+			if (!pageInfo.text || pageInfo.text.trim().length === 0) {
 				continue
 			}
 
-			content.config = { ...file.config, ...content.config }
-
-			// TODO: we need to have run tempo by now to get the proper dates for prefixed posts.
-			content.date = content.config.date.getTime()
-			content.id = file.id
-			content.sourceDir = path.dirname(file.id)
-
-			// get the title
-			if (content.config.title) {
-				content.title = content.config.title
-			} else if (content.text.trim().startsWith('# ')) {
-				content.title = content.text
-					.trim()
-					.split(/\r\n|\r|\n/g)[0]
-					.slice(2)
-					.trim()
-			} else {
-				content.title = file.config.pageName
-			}
-
-			content.config.title = content.title
-
-			// get the URL
-			const pathDir = content.config.dir || content.sourceDir
-			const pathEnd = content.config.rename || content.config.pageName
-			content.url = [
-				pathDir === '.' ? '' : pathDir,
-				pathEnd === 'index' ? '' : pathEnd
-			].join('/')
-
 			// add tags to top-level to allow querying
-			content.tags = content.config.tags
-
-			if (!content.url.startsWith('/')) {
-				content.url = '/' + content.url
-			}
-
-			// add previous and next pages.
-			const previousPage =
-				previousFile && previousFile.dir === file.dir
-					? previousFile.id
-					: undefined
+			pageInfo.tags = pageInfo.config.tags
 
 			let shouldShowPrevNext = true
 			for (let name of globals.specialFilenames) {
@@ -119,30 +77,37 @@ class Cache {
 				}
 			}
 
-			if (previousPage && shouldShowPrevNext) {
-				const previousPageObject = this.getPage(previousPage)
+			const pagePredicate = async (assetInfo) => {
+				const testExt = path.extname(assetInfo.path).toLowerCase().slice(1);
+				if (this.contentExtensions.indexOf(testExt) < 0) {
+					return false;
+				}
+				const testPageInfo = await configure.getPageInfo(baseDir, assetInfo.path);
+				if (!testPageInfo.text || testPageInfo.text.trim().length === 0) {
+					return false;
+				}
+
+				for (let name of globals.specialFilenames) {
+					if (assetInfo.file.startsWith(name)) {
+						return false;
+					}
+				}
+
+				return true;
+			};
+
+			if (shouldShowPrevNext) {
+				const previousPageObject = await configure.getPreviousPage(baseDir, filePath, pagePredicate)
 				if (previousPageObject) {
-					content.config.previous = {
-						url: previousPageObject.url,
-						id: previousPageObject.id,
-						title: previousPageObject.title
-					}
-
-					previousPageObject.config.next = {
-						url: content.url,
-						id: content.id,
-						title: content.title
-					}
-
-					// save the previous page object
-					this.pageCache.merge(previousPageObject, 'id')
+					pageInfo.previous = previousPageObject;
+				}
+				const nextPageObject = await configure.getNextPage(baseDir, filePath, pagePredicate)
+				if (nextPageObject) {
+					pageInfo.next = nextPageObject;
 				}
 			}
 
-			this.pageCache.merge(content, 'id')
-			if (shouldShowPrevNext) {
-				previousFile = file
-			}
+			this.pageCache.merge(pageInfo, 'id')
 		}
 	}
 

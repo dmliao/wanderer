@@ -5,8 +5,8 @@
 	"main": "index.js",
 	"scripts": {
 		"test": "node ./cli -i test/content -f test/frame -o test/build -c test/config.toml -a test/.cache --clean",
-    "docs": "node ./cli -i docs/content -f docs/frame -o docs/build -c docs/config.toml -a docs/.cache --clean",
-    "postinstall": "cd tools/install && node npm-install-all.js"
+		"docs": "node ./cli -i docs/content -f docs/frame -o docs/build -c docs/config.toml -a docs/.cache --clean",
+		"postinstall": "cd tools/install && node npm-install-all.js"
 	},
 	"bin": {
 		"wanderer": "./cli.js"

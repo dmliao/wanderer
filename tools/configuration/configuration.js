@@ -17,7 +17,7 @@ const defaultCacheObject = {};
 // retrieve the configuration of a particular file or folder, given the base dir (either frame or content)
 // optionally pass in a cache by reference, which will eventually fill with configs
 // to avoid re-fetching them
-const getConfiguration = (baseDir, targetFileOrDir, cacheObj) => {
+const getConfiguration = async (baseDir, targetFileOrDir, cacheObj) => {
 	cacheObj = cacheObj || defaultCacheObject;
 	const filepath = path.resolve(targetFileOrDir);
 
@@ -49,7 +49,7 @@ const getConfiguration = (baseDir, targetFileOrDir, cacheObj) => {
 
 	// get the file's configuration
 	if (fs.existsSync(filepath) && !fs.lstatSync(filepath).isDirectory()) {
-		const fileConfig = frontmatter(fs.readFileSync(filepath, 'utf-8')).config;
+		const fileConfig = await frontmatter.streamFrontmatter(filepath);
 		const totalConfig = {...dirConfig, ...fileConfig};
 
 		if (cacheObj) {

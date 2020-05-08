@@ -1,11 +1,12 @@
 const fs = require('fs');
 const path = require('upath');
 const getConfiguration = require('./configuration')
+const frontmatter = require('../frontmatter/index')
 
 const processTempoFilename = require('../tempo/process-tempo-filename')
 
 // an asset can be any file
-const getAssetInfo = (baseDir, targetFile) => {
+const getAssetInfo = async (baseDir, targetFile) => {
 	const targetFilePath = path.resolve(targetFile);
 	const stats = fs.statSync(targetFilePath);
 
@@ -22,7 +23,7 @@ const getAssetInfo = (baseDir, targetFile) => {
 	const updated = stats.mtime;
 	const pageName = pageTempo.name;
 
-	const config = getConfiguration(baseDir, targetFile);
+	const config = await getConfiguration(baseDir, targetFile);
 
 	// get the URL
 	const pathDir = config.dir || path.dirname(id)
@@ -43,8 +44,9 @@ const getAssetInfo = (baseDir, targetFile) => {
 	const assetInfo = {
 		path: targetFilePath,
 		id,
-		dir, 
-		file,
+		dir, // TODO: deprecate, we have the whole path now
+		file, // TODO: deprecate, we have the whole path now
+		sourceDir: path.dirname(id), // TODO: find a better name for this...
 		date,
 		updated,
 		pageName,
@@ -57,16 +59,16 @@ const getAssetInfo = (baseDir, targetFile) => {
 
 // a page specifically is a content file, so adds 
 // additional helpers like a title and the body text
-const getPageInfo = (baseDir, targetFile) => {
-	const assetInfo = getAssetInfo(baseDir, targetFile);
-	const assetText = fs.readFileSync(path.resolve(targetFile), 'utf-8');
+const getPageInfo = async (baseDir, targetFile) => {
+	const assetInfo = await getAssetInfo(baseDir, targetFile);
+	const pageText = frontmatter.getTextAfterFrontmatter(targetFile);
 	
 	// get the title
 	let title;
 	if (assetInfo.config.title) {
 		title = assetInfo.config.title
-	} else if (assetText.trim().startsWith('# ')) {
-		title = assetText
+	} else if (pageText.trim().startsWith('# ')) {
+		title = pageText
 			.trim()
 			.split(/\r\n|\r|\n/g)[0]
 			.slice(2)
@@ -77,7 +79,7 @@ const getPageInfo = (baseDir, targetFile) => {
 
 	return {
 		...assetInfo,
-		text: assetText,
+		text: pageText,
 		title,
 	}
 }
@@ -87,8 +89,8 @@ const getPageInfo = (baseDir, targetFile) => {
 // the predicate takes an assetInfo as input, and returns true if it's a valid page
 // this is a way to skip files that aren't pages, or index files.
 // example: 01-title.md
-const getPreviousPage = (baseDir, targetFile, predicate) => {
-	const assetInfo = getAssetInfo(baseDir, targetFile);
+const getPreviousPage = async (baseDir, targetFile, predicate) => {
+	const assetInfo = await getAssetInfo(baseDir, targetFile);
 
 	const possiblePages = fs.readdirSync(assetInfo.dir);
 	const startIndex = possiblePages.indexOf(assetInfo.file);
@@ -96,9 +98,9 @@ const getPreviousPage = (baseDir, targetFile, predicate) => {
 	for (let i = startIndex - 1; i >= 0; i--) {
 		const possibleFilename = possiblePages[i];
 		const possibleFilePath = path.resolve(assetInfo.dir, possibleFilename);
-		const newAssetInfo = getAssetInfo(baseDir, possibleFilePath);
-		if (predicate(newAssetInfo)) {
-			const newPageInfo = getPageInfo(baseDir, possibleFilePath);
+		const newAssetInfo = await getAssetInfo(baseDir, possibleFilePath);
+		if (await predicate(newAssetInfo)) {
+			const newPageInfo = await getPageInfo(baseDir, possibleFilePath);
 			return {
 				id: newPageInfo.id,
 				title: newPageInfo.title,
@@ -110,8 +112,8 @@ const getPreviousPage = (baseDir, targetFile, predicate) => {
 	return undefined;
 }
 
-const getNextPage = (baseDir, targetFile, predicate) => {
-	const assetInfo = getAssetInfo(baseDir, targetFile);
+const getNextPage = async (baseDir, targetFile, predicate) => {
+	const assetInfo = await getAssetInfo(baseDir, targetFile);
 
 	const possiblePages = fs.readdirSync(assetInfo.dir);
 	const startIndex = possiblePages.indexOf(assetInfo.file);
@@ -119,9 +121,9 @@ const getNextPage = (baseDir, targetFile, predicate) => {
 	for (let i = startIndex + 1; i < possiblePages.length; i++) {
 		const possibleFilename = possiblePages[i];
 		const possibleFilePath = path.resolve(assetInfo.dir, possibleFilename);
-		const newAssetInfo = getAssetInfo(baseDir, possibleFilePath);
-		if (predicate(newAssetInfo)) {
-			const newPageInfo = getPageInfo(baseDir, possibleFilePath);
+		const newAssetInfo = await getAssetInfo(baseDir, possibleFilePath);
+		if (await predicate(newAssetInfo)) {
+			const newPageInfo = await getPageInfo(baseDir, possibleFilePath);
 			return {
 				id: newPageInfo.id,
 				title: newPageInfo.title,

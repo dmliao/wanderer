@@ -28,7 +28,7 @@ const buildWandererDirectory = async (
 		shouldUpdateTouchFile
 	)
 
-	cache.update(touchedFiles)
+	await cache.update(contentDir, touchedFiles)
 
 	// once the cache is created all the files should be able to build independently
 	// so let's do it asynchronously

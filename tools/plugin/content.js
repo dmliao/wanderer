@@ -8,17 +8,18 @@ const createPrettyUrlPage = require('./utils/create-pretty-url-page')
 
 const globals = require('../common/globals')
 
-const plugin = (
+const plugin = async (
 	pluginFunction,
 	touchedFile,
 	targetDirPath,
+	baseContentDir,
 	baseFrameDir,
 	cache
 ) => {
 	let pageObject = cache.getPage(touchedFile.id)
 
 	if (!pageObject) {
-		cache.update([touchedFile])
+		await cache.update(baseContentDir, [touchedFile])
 		pageObject = cache.getPage(touchedFile.id)
 	}
 
@@ -38,7 +39,7 @@ const plugin = (
 		return
 	}
 
-	processedFilename = parsedConfig.rename || parsedConfig.pageName
+	processedFilename = parsedConfig.rename || pageObject.pageName
 
 	/**
 	 * genPageStatics - creates a file that contains static files associated with the page.
@@ -50,7 +51,7 @@ const plugin = (
 	 * }
 	 */
 	const genPageStatics = () => {
-		const sourceFilePath = path.resolve(touchedFile.dir, touchedFile.file)
+		const sourceFilePath = path.resolve(pageObject.dir, pageObject.file)
 
 		// figure out if we should add css / js files
 		const pageStatics = findStatics(sourceFilePath)
@@ -73,13 +74,15 @@ const plugin = (
 
 				if (typeof rawQuery === 'string') {
 					const relativeDir = path.join(
-						pageObject.sourceDir,
+						path.dirname(pageObject.id),
 						rawQuery
 					)
 					query = { sourceDir: relativeDir }
 				} else {
 					query = rawQuery
 				}
+
+
 
 				feeds[feedName] = cache.getFeed({
 					query,
@@ -140,8 +143,8 @@ const plugin = (
 	// call the pluginFunction
 	pluginFunction({
 		// base inputs
-		touchedFile,
 		baseFrameDir,
+		baseContentDir,
 		targetDirPath,
 		pageObject,
 

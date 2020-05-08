@@ -34,15 +34,17 @@ class Plugin {
 
 The `parse` function returns different options depending on whether the plugin processes **asset** or **content** files.
 
-All `opts` objects have a `touchedFile` parameter, which is an object with relevant information about the input file. That `fileInfo` object has the following shape:
+All `opts` objects have a `touchedFile` parameter, which is an object with relevant information about the input file. That `assetFile` object has the following shape:
 
 ```
 {
-    isModified: boolean, - whether or not the file was modified since last build
     id: string, - unique identifier for the file
     file: string, - filename with extension of the source directory
     dir: string, - path to the source directory of the file
-    config: object - the _directory_ configuration object. Includes dates.
+    config: object - the _file_ configuration object
+    url: string - expected URL of the page
+    date - Date object with the last modified (or custom set) date
+    updated - Date object with the last modified date
 }
 ```
 
@@ -50,7 +52,8 @@ All `opts` objects have a `touchedFile` parameter, which is an object with relev
 
 ```
 {
-    touchedFile, - fileInfo - object with information about the input file
+    assetInfo, - object with information about the input file
+    baseContentDir - string - path to the content directory
     baseFrameDir, - string - path to the frame directory
     targetDirPath, - string - path to the directory that this file should be saved in
     cacheDirectory - string - path to the cache directory for storing temporary files
@@ -64,9 +67,10 @@ All `opts` objects have a `touchedFile` parameter, which is an object with relev
     {
 		// base inputs
 		touchedFile, - fileInfo
+        baseContentDir - string - path to the content directory
 		baseFrameDir, - string
 		targetDirPath, - string
-		pageObject, - object - contains information for the content page such as the next / previous pages, as well as canonical URLs.
+		pageObject, - pageInfo - contains information for the content page such as the next / previous pages, as well as canonical URLs.
 
 		// generator functions
 		genPageStatics,
@@ -81,17 +85,12 @@ All `opts` objects have a `touchedFile` parameter, which is an object with relev
 }
 ```
 
-A **pageObject** has the following shape:
+A **pageInfo** has the following shape, and is an extension of the **assetInfo** object:
 
 ```
 {
-    date - Date object with the last modified (or custom set) date
-    title, - title of the page
-    text, - raw text of the page
-    config, - configuration, along with extra parts
-    sourceDir, - path of the source directory
-    url, - expected URL of the page
-    tags, - list of tags associated with the page
+    title - title of the page
+    text - raw text of the page
 }
 ```
 
@@ -112,7 +111,7 @@ static files are files that have the same name as a content file. Returns an obj
 
 ```
 [
-    ...pageObject
+    ...pageInfo
 ]
 ```
 

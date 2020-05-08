@@ -17,16 +17,15 @@ class CopyParser extends Plugin {
     parse(opts) {
         const {
             // base inputs
-            touchedFile,
+            assetInfo,
             baseFrameDir,
             targetDirPath,
             cacheDirectory
         } = opts;
     
-        const config = touchedFile.config;
-        const ext = path.parse(touchedFile.file).ext.slice(1);
-        const targetFilePath = path.resolve(targetDirPath, config.pageName + '.' + ext)
-        const sourceFilePath = path.resolve(touchedFile.dir, touchedFile.file)
+        const ext = path.parse(assetInfo.file).ext.slice(1);
+        const targetFilePath = path.resolve(targetDirPath, assetInfo.pageName + '.' + ext)
+        const sourceFilePath = path.resolve(assetInfo.dir, assetInfo.file)
         fs.copyFileSync(sourceFilePath, targetFilePath);
     }
 }
