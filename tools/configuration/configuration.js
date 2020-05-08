@@ -14,7 +14,7 @@ const getSingleDirConfig = (dir, configFilename) => {
 
 const defaultCacheObject = {};
 
-// retrieve the configuration of a particular file or folder, given the base dir.
+// retrieve the configuration of a particular file or folder, given the base dir (either frame or content)
 // optionally pass in a cache by reference, which will eventually fill with configs
 // to avoid re-fetching them
 const getConfiguration = (baseDir, targetFileOrDir, cacheObj) => {
@@ -29,6 +29,7 @@ const getConfiguration = (baseDir, targetFileOrDir, cacheObj) => {
 	const relativePath = path.relative(path.resolve(baseDir), filepath);
 	const dirsToGetConfigFrom = relativePath.split('/');
 	dirsToGetConfigFrom.pop();
+	dirsToGetConfigFrom.unshift('.');
 
 	let currentDirToExamine = baseDir;
 	for (const dir of dirsToGetConfigFrom) {
