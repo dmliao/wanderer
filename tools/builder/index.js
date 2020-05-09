@@ -1,13 +1,15 @@
 const fs = require('fs')
 const path = require('upath')
 
+const configure = require('../configuration')
 const parseFile = require('../plugin/index')
 const metaExtensions = ['toml']
 
 // cache is optional. If a cache is not provided, we'll create a temporary one
-const buildFile = (
+const buildFile = async (
 	pluginList,
 	touchedFile,
+	globalConfig,
 	baseContentDir,
 	baseFrameDir,
 	baseBuildDir,
@@ -17,8 +19,8 @@ const buildFile = (
 		return
 	}
 
-	const filePath = path.resolve(touchedFile.dir, touchedFile.file)
-	const ext = path.parse(touchedFile.file).ext.slice(1)
+	const filePath = touchedFile.path
+	const ext = path.parse(touchedFile.path).ext.slice(1)
 	const pagePath = path.relative(baseContentDir, filePath)
 
 	// ignore meta files
@@ -26,7 +28,7 @@ const buildFile = (
 		return
 	}
 
-	let config = touchedFile.config
+	let config = await configure.getConfiguration(baseContentDir, filePath, {});
 
 	// short circuit if private = true
 	if (config.private && config.private === true) {
@@ -36,20 +38,22 @@ const buildFile = (
 	const defaultTargetPath = path.resolve(baseBuildDir, pagePath)
 	const defaultTargetDir = path.dirname(defaultTargetPath)
 
+	let assetInfo = await configure.getAssetInfo(baseContentDir, filePath, {});
+
 	// Determine whether we should change file paths from config
 	let targetDir = defaultTargetDir
-	if (config.dir) {
-		targetDir = path.resolve(baseBuildDir, config.dir)
+	if (assetInfo.config.dir) {
+		targetDir = path.resolve(baseBuildDir, assetInfo.config.dir)
 		if (
-			config.pageName === 'index' &&
-			path.resolve(baseContentDir) !== path.resolve(touchedFile.dir) &&
+			assetInfo.pageName === 'index' &&
+			path.resolve(baseContentDir) !== path.resolve(assetInfo.config.dir) &&
 			path.resolve(baseBuildDir) === path.resolve(targetDir)
 		) {
 			// specialcase where if you try to make a directory top-level, we don't want the indexes to collide.
 			targetDir = path.resolve(
 				baseBuildDir,
 				config.dir,
-				path.basename(touchedFile.dir)
+				path.basename(assetInfo.config.dir)
 			)
 		}
 	}

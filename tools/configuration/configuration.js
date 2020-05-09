@@ -17,7 +17,7 @@ const defaultCacheObject = {};
 // retrieve the configuration of a particular file or folder, given the base dir (either frame or content)
 // optionally pass in a cache by reference, which will eventually fill with configs
 // to avoid re-fetching them
-const getConfiguration = async (baseDir, targetFileOrDir, cacheObj) => {
+const getConfiguration = async (baseDir, targetFileOrDir, globalConfig, cacheObj) => {
 	cacheObj = cacheObj || defaultCacheObject;
 	const filepath = path.resolve(targetFileOrDir);
 
@@ -25,7 +25,7 @@ const getConfiguration = async (baseDir, targetFileOrDir, cacheObj) => {
 		return cacheObj[filepath];
 	}
 	
-	let dirConfig = {};
+	let dirConfig = globalConfig || {};
 	const relativePath = path.relative(path.resolve(baseDir), filepath);
 	const dirsToGetConfigFrom = relativePath.split('/');
 	dirsToGetConfigFrom.pop();

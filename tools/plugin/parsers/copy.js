@@ -25,7 +25,7 @@ class CopyParser extends Plugin {
     
         const ext = path.parse(assetInfo.file).ext.slice(1);
         const targetFilePath = path.resolve(targetDirPath, assetInfo.pageName + '.' + ext)
-        const sourceFilePath = path.resolve(assetInfo.dir, assetInfo.file)
+        const sourceFilePath = path.resolve(assetInfo.path)
         fs.copyFileSync(sourceFilePath, targetFilePath);
     }
 }

@@ -26,7 +26,9 @@ const parseFile = async (pluginList, touchedFile, targetDirPath, baseContentDir,
         ];
     }
 
-    const ext = path.parse(touchedFile.file).ext.slice(1);
+    console.log(targetDirPath)
+
+    const ext = path.parse(touchedFile.path).ext.slice(1);
     let handled = false;
     for (let plugin of pluginList) {
         const validExtensions = plugin.getExtensions();

@@ -51,7 +51,7 @@ const plugin = async (
 	 * }
 	 */
 	const genPageStatics = () => {
-		const sourceFilePath = path.resolve(pageObject.dir, pageObject.file)
+		const sourceFilePath = path.resolve(pageObject.path)
 
 		// figure out if we should add css / js files
 		const pageStatics = findStatics(sourceFilePath)

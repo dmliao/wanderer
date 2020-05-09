@@ -27,15 +27,23 @@ class ImageParser extends Plugin {
     
         const ext = path.parse(assetInfo.file).ext.slice(1);
         const targetFilePath = path.resolve(targetDirPath, assetInfo.pageName + '.' + ext)
+        console.log(targetDirPath);
+        console.log(targetFilePath)
+        
     
         if (cacheDirectory) {
             const cacheFilename = assetInfo.id.replace(/\//gm, '_');
             const cacheFilePath = path.resolve(cacheDirectory, cacheFilename);
+
+            console.log(cacheFilename);
+            console.log(cacheFilePath)
+            console.log(assetInfo.updated)
         
             if (fs.existsSync(cacheFilePath)) {
                 const cacheUpdatedTime = fs.statSync(cacheFilePath).mtime
                 if (dayjs(assetInfo.updated).isBefore(cacheUpdatedTime)) {
                     // the cache is newer than the image, we can just use the cache image
+                    console.log('retrieving cached image')
                     if (path.resolve(cacheFilePath) !== path.resolve(targetFilePath)) {
                         fs.copyFileSync(cacheFilePath, targetFilePath);
                     }
@@ -44,13 +52,13 @@ class ImageParser extends Plugin {
             }
             
             // we need to recreate the cached image
-            processImage(path.resolve(assetInfo.dir, assetInfo.file), cacheFilePath).then(() => {
+            processImage(path.resolve(assetInfo.path), cacheFilePath).then(() => {
                 if (path.resolve(cacheFilePath) !== path.resolve(targetFilePath)) {
                     fs.copyFileSync(cacheFilePath, targetFilePath)
                 }
             })
         } else {
-            processImage(path.resolve(assetInfo.dir, assetInfo.file), targetFilePath)
+            processImage(path.resolve(assetInfo.path), targetFilePath)
         }
     }
 }

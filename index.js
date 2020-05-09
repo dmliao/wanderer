@@ -19,11 +19,11 @@ const buildWandererDirectory = async (
 ) => {
 	const cache = new Cache(cacheDir)
 	cache.setContentExtensions(pluginList)
+	cache.setGlobalConfig(config)
 
 	// build the content files
 	const touchedFiles = await touch(
 		contentDir,
-		config,
 		touchFile,
 		shouldUpdateTouchFile
 	)
@@ -34,9 +34,10 @@ const buildWandererDirectory = async (
 	// so let's do it asynchronously
 	await Promise.all(
 		touchedFiles.map(async (file) => {
-			return build(
+			return await build(
 				pluginList,
 				file,
+				config,
 				contentDir,
 				frameDir,
 				buildDir,

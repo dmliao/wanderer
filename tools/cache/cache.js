@@ -5,6 +5,7 @@ const globals = require('../common/globals')
 const configure = require('../configuration')
 class Cache {
 	constructor(cacheDir) {
+		this.globalConfig = {};
 		this.cacheDir = path.resolve(cacheDir)
 		this.contentExtensions = ['md', 'htm']
 
@@ -14,6 +15,10 @@ class Cache {
 		} else {
 			this.pageCache = TAFFY()
 		}
+	}
+
+	setGlobalConfig(config) {
+		this.globalConfig = config;
 	}
 
 	setContentExtensions(pluginList) {
@@ -47,16 +52,16 @@ class Cache {
 			}
 
 			const ext = path
-				.extname(file.file)
+				.extname(file.path)
 				.toLowerCase()
 				.slice(1)
 			if (this.contentExtensions.indexOf(ext) < 0) {
 				continue
 			}
 
-			const filePath = path.resolve(file.dir, file.file)
+			const filePath = file.path;
 
-			const pageInfo = await configure.getPageInfo(baseDir, filePath)
+			const pageInfo = await configure.getPageInfo(baseDir, filePath, this.globalConfig)
 			if (pageInfo.config.private && pageInfo.config.private === true) {
 				continue
 			}
@@ -71,7 +76,7 @@ class Cache {
 
 			let shouldShowPrevNext = true
 			for (let name of globals.specialFilenames) {
-				if (file.file.startsWith(name)) {
+				if (pageInfo.file.startsWith(name)) {
 					shouldShowPrevNext = false
 					break
 				}

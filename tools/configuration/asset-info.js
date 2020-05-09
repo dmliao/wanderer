@@ -6,7 +6,7 @@ const frontmatter = require('../frontmatter/index')
 const processTempoFilename = require('../tempo/process-tempo-filename')
 
 // an asset can be any file
-const getAssetInfo = async (baseDir, targetFile) => {
+const getAssetInfo = async (baseDir, targetFile, globalConfig) => {
 	const targetFilePath = path.resolve(targetFile);
 	const stats = fs.statSync(targetFilePath);
 
@@ -23,7 +23,7 @@ const getAssetInfo = async (baseDir, targetFile) => {
 	const updated = stats.mtime;
 	const pageName = pageTempo.name;
 
-	const config = await getConfiguration(baseDir, targetFile);
+	const config = await getConfiguration(baseDir, targetFile, globalConfig);
 
 	// get the URL
 	const pathDir = config.dir || path.dirname(id)
@@ -59,8 +59,8 @@ const getAssetInfo = async (baseDir, targetFile) => {
 
 // a page specifically is a content file, so adds 
 // additional helpers like a title and the body text
-const getPageInfo = async (baseDir, targetFile) => {
-	const assetInfo = await getAssetInfo(baseDir, targetFile);
+const getPageInfo = async (baseDir, targetFile, globalConfig) => {
+	const assetInfo = await getAssetInfo(baseDir, targetFile, globalConfig);
 	const pageText = frontmatter.getTextAfterFrontmatter(targetFile);
 	
 	// get the title
