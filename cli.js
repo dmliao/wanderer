@@ -1,11 +1,10 @@
 #! /usr/bin/env node
 
-const toml = require('@iarna/toml')
 const path = require('upath')
 const fs = require('fs')
 
 var argv = require('minimist')(process.argv.slice(2))
-const wanderer = require('./index')
+const wanderer = require('./src/index')
 
 console.time('build')
 
@@ -20,17 +19,7 @@ const frameDir = argv.frame || argv.f || path.resolve(process.cwd(), 'frame')
 const contentDir = argv.in || argv.i || path.resolve(process.cwd(), 'content')
 const buildDir = argv.out || argv.o || path.resolve(process.cwd(), 'build')
 const cacheDir = argv.cache || argv.a || path.resolve(process.cwd(), '.cache')
-
-let metaConfig = {}
-
-const configFile =
-	argv.config || argv.c || path.resolve(process.cwd(), 'config.toml')
-if (fs.existsSync(configFile)) {
-	const extraConfig = toml.parse(
-		fs.readFileSync(configFile)
-	)
-	metaConfig = { ...metaConfig, ...extraConfig }
-}
+const configFile = argv.config || argv.c || path.resolve(process.cwd(), 'config.toml')
 
 if (argv.clean) {
 	// clean up cache stuff
@@ -57,6 +46,4 @@ if (argv.clean) {
 	}
 }
 
-wanderer(metaConfig, frameDir, contentDir, cacheDir, buildDir).then(() =>
-	console.timeEnd('build')
-)
+wanderer(configFile, frameDir, contentDir, cacheDir, buildDir).then(() => console.timeEnd('build'))

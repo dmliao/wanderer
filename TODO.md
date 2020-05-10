@@ -1,34 +1,76 @@
-[ ] - separate out module and CLI
-[ ] - create system for adding in extra parsers (mainly so I can include stage parsers. Plugins?)
+# Reorganization
 
-Plugins are single functions, given the following args:
+This has gotten big enough that I need to probably separate it out and test it properly. And maybe use Typescript.
 
-const plugin = (opts) => {
-	/*
-	opts = {
-		fileInfo: touchedFile,
-		baseFrameDir,
-		targetDirPath,
-		cache,
-		tools: {
-			harpe,
-			template,
-			findStatics,
-			createPrettyUrlPage
-		}
-	}
-	*/
+## Wanderer Pipeline
 
-	// do things
-}
+### Creating SiteInfo
 
-register a plugin by setting the file extension, and the plugin function
-wanderer({
-	plugins: {
-		'md': pluginFunction,
-		'stage', pluginFunction,
-		...
-	}
-})
+SiteInfo tells us the global site information, where things are stored, etc.
 
-CLI runs with no plugins.
+globalConfig
+contentDir
+frameDir
+buildDir
+cacheDir
+
+|
+v
+
+genSiteInfo
+
+|
+v
+
+siteInfo object
+
+### Creating Asset / Page Info
+
+siteInfo object
+file path
+
+|
+v
+
+configure (which uses frontmatter)
+
+|
+v
+
+pageInfo object
+
+### listing out pages
+
+siteInfo object -> touch -> filepaths[]
+
+### creating plugins
+
+siteInfo -> genPlugins -> pluginList[]
+
+### creating a cache (used only to create feeds and page links)
+
+siteInfo
+filepaths[]
+pluginList[]
+
+|
+v
+
+cache
+
+### build out pages
+
+siteInfo
+file path
+pluginList[]
+cache
+
+|
+v
+
+builder
+
+|
+v
+
+site!!!
