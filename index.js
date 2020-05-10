@@ -1,9 +1,9 @@
-const genSiteInfo = require('./pipeline/01-gen-site-info')
-const genTouch = require('./pipeline/02-touch')
-const genPlugins = require('./pipeline/03-gen-plugins')
-const genInfo = require('./pipeline/04-gen-page-info')
-const genCache = require('./pipeline/05-cache')
-const genBuildFiles = require('./pipeline/06-builder')
+const genSiteInfo = require('./src/pipeline/01-gen-site-info')
+const genTouch = require('./src/pipeline/02-touch')
+const genPlugins = require('./src/pipeline/03-gen-plugins')
+const genInfo = require('./src/pipeline/04-gen-page-info')
+const genCache = require('./src/pipeline/05-cache')
+const genBuildFiles = require('./src/pipeline/06-builder')
 
 const wanderer = async (configFile, frameDir, contentDir, cacheDir, buildDir) => {
 	const siteInfo = await genSiteInfo(configFile, contentDir, frameDir, cacheDir, buildDir)
@@ -32,8 +32,5 @@ const wanderer = async (configFile, frameDir, contentDir, cacheDir, buildDir) =>
 	const contentTouchedFiles = await genTouch.genTouchContentFiles(siteInfo)
 	await wandererPass(contentTouchedFiles)
 }
-/*
-wanderer('../test/config.toml', '../test/content', '../test/frame', '../.cache', '../test/build')
-*/
 
 module.exports = wanderer

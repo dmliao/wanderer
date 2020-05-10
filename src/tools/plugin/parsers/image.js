@@ -31,15 +31,10 @@ class ImageParser extends Plugin {
 			const cacheFilename = fileInfo.id.replace(/\//gm, '_')
 			const cacheFilePath = path.resolve(cacheDirectory, cacheFilename)
 
-			console.log(cacheFilename)
-			console.log(cacheFilePath)
-			console.log(fileInfo.updated)
-
 			if (fs.existsSync(cacheFilePath)) {
 				const cacheUpdatedTime = fs.statSync(cacheFilePath).mtime
 				if (dayjs(fileInfo.updated).isBefore(cacheUpdatedTime)) {
 					// the cache is newer than the image, we can just use the cache image
-					console.log('retrieving cached image')
 					if (path.resolve(cacheFilePath) !== path.resolve(targetFilePath)) {
 						fs.copyFileSync(cacheFilePath, targetFilePath)
 					}

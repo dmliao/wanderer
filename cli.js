@@ -4,7 +4,7 @@ const path = require('upath')
 const fs = require('fs')
 
 var argv = require('minimist')(process.argv.slice(2))
-const wanderer = require('./src/index')
+const wanderer = require('./index')
 
 console.time('build')
 
