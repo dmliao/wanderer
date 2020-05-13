@@ -1,0 +1,1 @@
+node ./cli $1 -i test/content -f test/frame -c test/config.toml --info
