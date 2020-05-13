@@ -1,3 +1,5 @@
+const path = require('upath')
+
 const genSiteInfo = require('./src/pipeline/01-gen-site-info')
 const genTouch = require('./src/pipeline/02-touch')
 const genPlugins = require('./src/pipeline/03-gen-plugins')
@@ -10,27 +12,28 @@ const wanderer = async (configFile, frameDir, contentDir, cacheDir, buildDir) =>
 
 	const pluginList = await genPlugins(siteInfo)
 
-	const wandererPass = async (touchedFiles) => {
+	const wandererPass = async (passSiteInfo, touchedFiles) => {
 		const filePaths = touchedFiles.map((touchedFile) => {
 			return touchedFile.path
 		})
 
-		const fileInfos = await genInfo.genFilesInfo(siteInfo, filePaths, pluginList)
-		const staticCache = await genCache(siteInfo, fileInfos)
-		await genBuildFiles(siteInfo, fileInfos, pluginList, staticCache)
+		const fileInfos = await genInfo.genFilesInfo(passSiteInfo, filePaths, pluginList)
+		const cache = await genCache(passSiteInfo, fileInfos)
+		await genBuildFiles(passSiteInfo, fileInfos, pluginList, cache)
 	}
 
 	// PASS 1: Frame
 	console.log('building frame...')
 
 	// build the frame
-	const staticTouchedFiles = await genTouch.genTouchStaticFiles(siteInfo)
-	await wandererPass(staticTouchedFiles)
+	const staticSiteInfo = { ...siteInfo, buildDir: path.resolve(siteInfo.buildDir, 'static') }
+	const staticTouchedFiles = await genTouch.genTouchStaticFiles(staticSiteInfo)
+	await wandererPass(staticSiteInfo, staticTouchedFiles)
 
 	// PASS 2: CONTENT
 	console.log('building content...')
 	const contentTouchedFiles = await genTouch.genTouchContentFiles(siteInfo)
-	await wandererPass(contentTouchedFiles)
+	await wandererPass(siteInfo, contentTouchedFiles)
 }
 
 module.exports = wanderer

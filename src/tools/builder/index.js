@@ -23,7 +23,8 @@ const buildFile = async (siteInfo, fileInfo, pluginList, cache) => {
 		targetDir = path.resolve(siteInfo.buildDir, fileInfo.config.dir)
 		if (
 			fileInfo.pageName === 'index' &&
-			path.resolve(siteInfo.contentDir) !== path.resolve(fileInfo.config.dir) &&
+			// make sure we don't do this for the top-level index files
+			path.resolve(siteInfo.contentDir) !== path.resolve(fileInfo.dir) &&
 			path.resolve(siteInfo.buildDir) === path.resolve(targetDir)
 		) {
 			// specialcase where if you try to make a directory top-level, we don't want the indexes to collide.
