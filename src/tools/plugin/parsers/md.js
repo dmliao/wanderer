@@ -42,10 +42,9 @@ class MDParser extends Plugin {
 		const templateVars = {
 			// adds page-specific css and js
 			...pageStatics,
-
+			...pageObject,
 			// adds anything from the frontmatter + folder config at top-level
 			...parsedConfig,
-			...pageObject,
 			feeds,
 			content: html,
 			_baseDir: siteInfo.frameDir,
