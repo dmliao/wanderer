@@ -144,7 +144,7 @@ const render = (template, config, layer) => {
 		currentString = eval('`' + currentString + '`')
 	}
 
-	return currentString.replace('\\$', '$')
+	return currentString.replace(/\\\$/gm, '$')
 }
 
 module.exports = render
