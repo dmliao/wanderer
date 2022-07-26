@@ -2,6 +2,10 @@
 
 an opinionated static site generator written in Node.JS.
 
+> **NOTE: This project has migrated, and was refactored and rewritten in Typescript, [here](https://github.com/a-morphous/wanderer).**
+>
+> This version remains as a record of the pre-Typescript version, but will not be maintained.
+
 [Source Code](https://github.com/dmliao/wanderer)
 
 Is it ready for production use? It's ready in the sense that I personally use it. But it's very much a tool that's made by me, _for_ me, and thus might not be suited to your needs.
